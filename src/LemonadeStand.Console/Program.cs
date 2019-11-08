@@ -11,9 +11,7 @@ namespace LemonadeStand.Console
 
             game.GetInput = System.Console.ReadLine;
             game.Output += (s, e) => System.Console.Write(e.Text);
-
             game.Run();
-
         }
     }
 }
