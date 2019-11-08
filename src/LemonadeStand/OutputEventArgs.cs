@@ -1,4 +1,4 @@
-namespace LemonadeStand
+namespace NegativeEddy.LemonadeStand
 {
     public class OutputEventArgs
     {

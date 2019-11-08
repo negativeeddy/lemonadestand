@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\LemonadeStand\LemonadeStand.csproj" />
@@ -7,6 +7,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>NegativeEddy.LemonadeStand.Console</AssemblyName>
+    <RootNamespace>NegativeEddy.LemonadeStand.Console</RootNamespace>
   </PropertyGroup>
 
 </Project>

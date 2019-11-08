@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LemonadeStand
+namespace NegativeEddy.LemonadeStand
 {
     public class Game
     {
@@ -417,14 +417,14 @@ namespace LemonadeStand
                     else
                     {
                         // 1220 N1 = ((P9 ^ 2) * S2 / P(I) ^ 2)
-                        N1 = ((P9_MaxPricePerGlassCents * P9_MaxPricePerGlassCents) * S2 / (P_PricePerGlassCents[I] * P_PricePerGlassCents[I]));
+                        N1 = P9_MaxPricePerGlassCents * P9_MaxPricePerGlassCents * S2 / (P_PricePerGlassCents[I] * P_PricePerGlassCents[I]);
                     }
                     // 1230 W =  - S(I) * C9
-                    double W = - S_SignsMade[I] * C9;
+                    double W = -S_SignsMade[I] * C9;
                     // 1232 V = 1 - ( EXP (W)     * C2)
-                    double V =  1 - ( Math.Exp(W) * C2);
+                    double V = 1 - Math.Exp(W) * C2;
                     // 1234 N2 = R1 * (N1 + (N1 * V))
-                    double tmp = R1_WeatherFactor * ((double)N1 + ((double)N1 * V));
+                    double tmp = R1_WeatherFactor * ((double)N1 + (double)N1 * V);
                     // 1240 N2 =  INT (N2 * G(I))
                     N2_GlassesSold = (int)(tmp * G_RuinedByThunderstorm[I]);
                     // 1250  IF N2 <  = L(I) THEN 1270

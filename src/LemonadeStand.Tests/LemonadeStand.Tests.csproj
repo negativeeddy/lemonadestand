@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>NegativeEddy.LemonadeStand.Tests</RootNamespace>
+
+    <AssemblyName>.LemonadeStand.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿using System;
-using LemonadeStand;
+using NegativeEddy.LemonadeStand;
 
-namespace LemonadeStand.Console
+namespace NegativeEddy.LemonadeStand.Console
 {
     class Program
     {

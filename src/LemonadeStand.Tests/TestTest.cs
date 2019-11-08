@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Prime.UnitTests.Services
+namespace NegativeEddy.LemonadeStand.Tests
 {
     public class PrimeService_IsPrimeShould
     {
