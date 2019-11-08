@@ -4,18 +4,23 @@ namespace NegativeEddy.LemonadeStand
 {
     public class Game
     {
-        public event EventHandler<OutputEventArgs> Output;
+        private IGameIO _io;
+        private IRandom _random;
 
-        public Func<string> GetInput;
+        public Game(IGameIO io, IRandom random)
+        {
+            _io = io;
+            _random = random;
+        }
 
         protected void Print(string text)
         {
-            Output?.Invoke(this, new OutputEventArgs { Text = text + Environment.NewLine });
+            _io.Output(text + Environment.NewLine);
         }
 
         protected void Print()
         {
-            Output?.Invoke(this, new OutputEventArgs { Text = Environment.NewLine });
+            _io.Output(Environment.NewLine);
         }
 
         private int D_Day; // Day of simulation?
@@ -127,7 +132,6 @@ namespace NegativeEddy.LemonadeStand
             }
         }
 
-        Random rand = new Random();
         private int J_ChanceOfRain;
         private int X4;
 
@@ -135,7 +139,7 @@ namespace NegativeEddy.LemonadeStand
         {
             // 400  REM   WEATHER REPORT
             // 410 SC =  RND (1)
-            SC_SkyColor = rand.Next(10);
+            SC_SkyColor = _random.Next(10);
             // 420  IF SC < .6 THEN SC = 2: GOTO 460
             // 430  IF SC < .8 THEN SC = 10: GOTO 460
             // 440 SC = 7
@@ -263,7 +267,7 @@ namespace NegativeEddy.LemonadeStand
                         Print("HOW MANY GLASSES OF LEMONADE DO YOU");
                         Print("WISH TO MAKE ");
                         // 900	INPUT L(I)
-                        L_GlassesMade[I] = int.Parse(GetInput());
+                        L_GlassesMade[I] = int.Parse(_io.GetInput());
                         // 901	IF L(I) < 0 OR L(I) > 1000 THEN 903
                         // 902	GOTO 906
                         if (L_GlassesMade[I] < 0 || L_GlassesMade[I] > 1000)
@@ -303,7 +307,7 @@ namespace NegativeEddy.LemonadeStand
                         Print($"HOW MANY ADVERTISING SIGNS ({S3_CostPerSign * 100} CENTS");
                         Print($"EACH) DO YOU WANT TO MAKE ");
                         // 960	INPUT S(I)
-                        S_SignsMade[I] = int.Parse(GetInput());
+                        S_SignsMade[I] = int.Parse(_io.GetInput());
                         // 961	IF S(I) < 0 OR S(I) > 50 THEN 963
                         // 962	GOTO 965
                         if (S_SignsMade[I] < 0 || S_SignsMade[I] > 50)
@@ -343,7 +347,7 @@ namespace NegativeEddy.LemonadeStand
                         Print("WHAT PRICE (IN CENTS) DO YOU WISH TO");
                         Print("CHARGE FOR LEMONADE ");
                         // 1015  INPUT P(I)
-                        P_PricePerGlassCents[I] = int.Parse(GetInput());
+                        P_PricePerGlassCents[I] = int.Parse(_io.GetInput());
                         // 1020	IF P(I) < 0 OR P(I) > 100 THEN 1022
                         // 1021	GOTO 1024
                         if (P_PricePerGlassCents[I] <= 0 || P_PricePerGlassCents[I] >= 100)
@@ -370,7 +374,7 @@ namespace NegativeEddy.LemonadeStand
             // 1110 C5 = 0: TEXT : HOME
             // 1120  PRINT : IF SC = 10 AND  RND (1) < .25 THEN 2300
             Print();
-            if (SC_SkyColor == 10 && rand.Next(100) < 25)
+            if (SC_SkyColor == 10 && _random.Next(100) < 25)
             {
                 Sub2300_Thunderstorm_Then1185();
             }
@@ -519,10 +523,10 @@ namespace NegativeEddy.LemonadeStand
                 // 2100  IF X1 = 1 THEN 805    { unreachable }
             }
             // 2040  IF  RND (1) < .25 THEN 2210
-            if (rand.Next(100) > 25)
+            if (_random.Next(100) > 25)
             {
                 // 2110 J = 30 +  INT ( RND (1) * 5) * 10
-                J_ChanceOfRain = 30 + rand.Next(5) * 10;
+                J_ChanceOfRain = 30 + _random.Next(5) * 10;
                 // 2112  PRINT "THERE IS A ";J;"% CHANCE OF LIGHT RAIN,"
                 Print($"THERE IS A {J_ChanceOfRain}% CHANCE OF LIGHT RAIN,");
                 // 2115  PRINT "AND THE WEATHER IS COOLER TODAY."
@@ -545,7 +549,7 @@ namespace NegativeEddy.LemonadeStand
             // 2231	R2 = 2
             // 2232	GOTO 2250
             // 2233	R1 = .1
-            if (rand.Next(100) < 50)
+            if (_random.Next(100) < 50)
             {
                 R1_WeatherFactor = 0.1;
             }
@@ -789,7 +793,7 @@ namespace NegativeEddy.LemonadeStand
             {
                 // 12200  VTAB 21: CALL  - 958
                 // : INPUT "TYPE YOUR ANSWER AND HIT RETURN ==> ";A$ 
-                AS = GetInput();
+                AS = _io.GetInput();
                 // 12210 A$ =  LEFT$ (A$,1)
                 AS = AS.Substring(0, 1);
                 // : IF A$ <  > "Y" AND A$ <  > "N" THEN  PRINT CHR$ (7);: GOTO 12200
@@ -801,7 +805,7 @@ namespace NegativeEddy.LemonadeStand
                 // 12220  VTAB 23: CALL  - 958
                 // : INPUT "HOW MANY PEOPLE WILL BE PLAYING ==> ";N$
                 Print("HOW MANY PEOPLE WILL BE PLAYING?");
-                string NS = GetInput();
+                string NS = _io.GetInput();
                 // 12230 N =  VAL (N$)
                 N_NumberOfPlayers = int.Parse(NS);
                 // : IF N < 1 OR N > 30 THEN  PRINT  CHR$ (7);: GOTO 12220 
@@ -986,7 +990,7 @@ namespace NegativeEddy.LemonadeStand
             // 18000  VTAB 24: PRINT " PRESS SPACE TO CONTINUE, ESC TO END...";
             Print(" PRESS ENTER TO CONTINUE, Q TO END...");
             // 18010  GET IN$: IF IN$ <  > " " AND  ASC (IN$) <  > 27 THEN 18010
-            string INS = GetInput();
+            string INS = _io.GetInput();
             // 18020  IF  ASC (IN$) = 27 THEN 31111
             if (INS == "Q")
             {

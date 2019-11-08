@@ -1,5 +1,4 @@
-﻿using System;
-using NegativeEddy.LemonadeStand;
+﻿using NegativeEddy.LemonadeStand;
 
 namespace NegativeEddy.LemonadeStand.Console
 {
@@ -7,10 +6,7 @@ namespace NegativeEddy.LemonadeStand.Console
     {
         static void Main(string[] args)
         {
-            var game = new Game();
-
-            game.GetInput = System.Console.ReadLine;
-            game.Output += (s, e) => System.Console.Write(e.Text);
+            var game = new Game(new ConsoleIO(), new NetStandardRandom());
             game.Run();
         }
     }

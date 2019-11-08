@@ -11,7 +11,7 @@ namespace NegativeEddy.LemonadeStand.Tests
         [Fact]
         public void IsPrime_InputIs1_ReturnFalse()
         {
-            var stand = new LemonadeStand.Game();
+            var stand = new LemonadeStand.Game(null, null);
             Assert.False(false, "1 should not be prime");
         }
     }
