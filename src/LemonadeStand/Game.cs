@@ -174,12 +174,15 @@ namespace NegativeEddy.LemonadeStand
             // 540 C = 2
             // : IF D > 2 THEN C = 4
             // 550  IF D > 6 THEN C = 5
-            C_CostPerGlassCents = 2;
-            if (D_Day > 2)
+            if (D_Day < 3)
+            {
+                C_CostPerGlassCents = 2;
+            }
+            else if (D_Day < 7)
             {
                 C_CostPerGlassCents = 4;
             }
-            else if (D_Day > 6)
+            else 
             {
                 C_CostPerGlassCents = 5;
             }
