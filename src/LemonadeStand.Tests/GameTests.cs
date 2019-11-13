@@ -5,10 +5,11 @@ using Xunit.Abstractions;
 
 namespace NegativeEddy.LemonadeStand.Tests
 {
-    public class PrimeService_IsPrimeShould
+    public class GameTests
     {
         private readonly ITestOutputHelper _output;
-        public PrimeService_IsPrimeShould(ITestOutputHelper output)
+
+        public GameTests(ITestOutputHelper output)
         {
             _output = output;
         }
@@ -20,6 +21,10 @@ namespace NegativeEddy.LemonadeStand.Tests
             stand.Init();
             stand.Step();
             Assert.Equal(1.85M, stand.Assets[0]);
+            stand.Step();
+            Assert.Equal(1.70M, stand.Assets[0]);
+            stand.Step();
+            Assert.Equal(1.35M, stand.Assets[0]);
         }
     }
 
@@ -31,16 +36,27 @@ namespace NegativeEddy.LemonadeStand.Tests
             _output = output;
         }
 
-        public (string input, string output)[] Story { get; set; } = new (string, string)[]
+        public string [] Story { get; set; } = new string[]
         {
-            ("Y", null),
-            ("1", null),
-            ("", null),
-            ("", null),
-            ("10", null), // 10 glasses
-            ("3", null), // 3 signs
-            ("5", null), // 5 cents/glass
-            ("", null),
+            "Y",
+            "1",
+            "",
+            "",
+
+            "10", // 10 glasses
+            "3", // 3 signs
+            "5", // 5 cents/glass
+            "",
+
+            "10", // 10 glasses
+            "3", // 3 signs
+            "5", // 5 cents/glass
+            "",
+
+            "10", // 10 glasses
+            "3", // 3 signs
+            "5", // 5 cents/glass
+            "",
         };
 
         public string[] ExpectedOutput { get; set; } = new string[]
@@ -63,18 +79,9 @@ namespace NegativeEddy.LemonadeStand.Tests
 
         public string GetInput()
         {
-            AssertStep(step - 1);
-            string line = Story[step++].input;
-            _output.WriteLine(line);
+            string line = Story[step++];
+            _output.WriteLine(">> " + line);
             return line;
-        }
-
-        private void AssertStep(int i)
-        {
-            if (i < 0 || Story[i].output == null)
-            {
-                return;
-            }
         }
     }
 }
