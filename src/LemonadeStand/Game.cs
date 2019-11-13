@@ -2,7 +2,7 @@
 
 namespace NegativeEddy.LemonadeStand
 {
-    public class Game
+    public partial class Game
     {
         private readonly IGameIO _io;
         private readonly IRandom _random;
@@ -28,16 +28,7 @@ namespace NegativeEddy.LemonadeStand
         /// </summary>
         public int Day { get; set; }
 
-        /// <summary>
-        /// Assets (cash on hand, in dollars)
-        /// </summary>
-        public decimal[] Assets { get; set; } 
-        private int[] G_RuinedByThunderstorm;// G(i): normally 1; 0 if everything is ruined by thunderstorm 
-        private int[] Bankruptcy;
-        private int[] L_GlassesMade; // L(i): number of glasses of lemonade made by player i 
-        private int[] P_PricePerGlassCents; //P(i): Price charged for lemonade, per glass, in cents 
-        private int[] S_SignsMade; // S(i): Number of signs made by player i 
-        private decimal[] H; // H(i): apparently intended to relate to storms, but never assigned a value 
+        public Stand[] Stands { get; set; }
 
         private int C_CostPerGlassCents; // C: cost of lemonade per glass, in cents 
         private int P9_MaxPricePerGlassCents;
@@ -93,13 +84,7 @@ namespace NegativeEddy.LemonadeStand
             // 175 A2 = 2.00
             // 194	C9 = .5
             // 195	C2 = 1
-            Assets = new decimal[30];
-            L_GlassesMade = new int[30];
-            H = new decimal[30];
-            Bankruptcy = new int[30];
-            S_SignsMade = new int[30];
-            P_PricePerGlassCents = new int[30];
-            G_RuinedByThunderstorm = new int[30];
+            Stands = new Stand[30];
 
             Day = 0;
             P9_MaxPricePerGlassCents = 10;
@@ -115,8 +100,9 @@ namespace NegativeEddy.LemonadeStand
             // : FOR I = 1 TO N:B(I) = 0:A(I) = A2: NEXT
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
-                Bankruptcy[I] = 0;
-                Assets[I] = InitialAssets;
+                Stands[I] = new Stand();
+                Stands[I].Bankruptcy = 0;
+                Stands[I].Assets = InitialAssets;
             }
             // 320  IF A$ = "Y" THEN  GOSUB 13000: GOTO 400
             // 330  GOSUB 14000
@@ -233,25 +219,23 @@ namespace NegativeEddy.LemonadeStand
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 // 820 G(I) = 1:H(I) = 0
-                G_RuinedByThunderstorm[I] = 1;
-                H[I] = 0;
+                Stands[I].G_RuinedByThunderstorm = 1;
+                Stands[I].H = 0;
                 // 850 STI = A(I)
                 // : GOSUB 4000
                 // : PRINT "LEMONADE STAND ";I; TAB( 26);"ASSETS ";STI$ 
                 // 855  PRINT
-                STI = Assets[I];
-                Sub4000_AssetsToString();
-                Print($"LEMONADE STAND {I} ASSETS {STIS}");
+                Print($"LEMONADE STAND {I} ASSETS {Stands[I].Assets:C2}");
                 Print();
                 // 860  IF B(I) = 0 THEN 890
-                if (Bankruptcy[I] != 0)
+                if (Stands[I].Bankruptcy != 0)
                 {
                     // 870  PRINT "YOU ARE BANKRUPT, NO DECISIONS"
                     // 875	PRINT "FOR YOU TO MAKE."
                     Print("YOU ARE BANKRUPT, NO DECISIONS");
                     Print("FOR YOU TO MAKE.");
                     // 876	IF N = 1 AND A(1) < C THEN 31111
-                    if (N_NumberOfPlayers == 1 && Assets[0] < C_CostPerGlassCents)
+                    if (N_NumberOfPlayers == 1 && Stands[0].Assets < C_CostPerGlassCents)
                     {
                         Sub31111_Exit();
                     }
@@ -266,10 +250,10 @@ namespace NegativeEddy.LemonadeStand
                         Print("HOW MANY GLASSES OF LEMONADE DO YOU");
                         Print("WISH TO MAKE ");
                         // 900	INPUT L(I)
-                        L_GlassesMade[I] = int.Parse(_io.GetInput());
+                        Stands[I].L_GlassesMade = int.Parse(_io.GetInput());
                         // 901	IF L(I) < 0 OR L(I) > 1000 THEN 903
                         // 902	GOTO 906
-                        if (L_GlassesMade[I] < 0 || L_GlassesMade[I] > 1000)
+                        if (Stands[I].L_GlassesMade < 0 || Stands[I].L_GlassesMade > 1000)
                         {
                             // 903	PRINT "COME ON, LET'S BE REASONABLE NOW!!!"
                             // 904	PRINT "TRY AGAIN"
@@ -283,7 +267,7 @@ namespace NegativeEddy.LemonadeStand
                         // dont need this, input is always an integer
 
                         // 910  IF L(I) * C1 <  = A(I) THEN 950
-                        if (L_GlassesMade[I] * C1_CostPerGlassDollars <= Assets[I])
+                        if (Stands[I].L_GlassesMade * C1_CostPerGlassDollars <= Stands[I].Assets)
                         {
                             // user can purchase that amount of lemonade
                             break;
@@ -291,9 +275,9 @@ namespace NegativeEddy.LemonadeStand
                         // 920  PRINT "THINK AGAIN!!!  YOU HAVE ONLY ";STI$
                         // 930  PRINT "IN CASH AND TO MAKE ";L(I);" GLASSES OF"
                         // 932  PRINT "LEMONADE YOU NEED $";L(I) * C1;" IN CASH."
-                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {STIS} ");
-                        Print($"IN CASH AND TO MAKE {L_GlassesMade[I]} GLASSES OF ");
-                        Print($"LEMONADE YOU NEED ${L_GlassesMade[I] * C1_CostPerGlassDollars:C2} IN CASH.");
+                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {Stands[I].Assets:C2} ");
+                        Print($"IN CASH AND TO MAKE {Stands[I].L_GlassesMade} GLASSES OF ");
+                        Print($"LEMONADE YOU NEED ${Stands[I].L_GlassesMade * C1_CostPerGlassDollars:C2} IN CASH.");
                         // 940  GOTO 890
                     }
 
@@ -306,10 +290,10 @@ namespace NegativeEddy.LemonadeStand
                         Print($"HOW MANY ADVERTISING SIGNS ({S3_CostPerSign * 100} CENTS");
                         Print($"EACH) DO YOU WANT TO MAKE ");
                         // 960	INPUT S(I)
-                        S_SignsMade[I] = int.Parse(_io.GetInput());
+                        Stands[I].S_SignsMade = int.Parse(_io.GetInput());
                         // 961	IF S(I) < 0 OR S(I) > 50 THEN 963
                         // 962	GOTO 965
-                        if (S_SignsMade[I] < 0 || S_SignsMade[I] > 50)
+                        if (Stands[I].S_SignsMade < 0 || Stands[I].S_SignsMade > 50)
                         {
                             // 963	PRINT "COME ON, BE REASONABLE!!! TRY AGAIN."
                             Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
@@ -321,7 +305,7 @@ namespace NegativeEddy.LemonadeStand
                         // S[I] is always an int, dont need this check
 
                         // 970  IF S(I) * S3 <  = A(I) - L(I) * C1 THEN 1010
-                        if (S_SignsMade[I] * S3_CostPerSign <= Assets[I] - L_GlassesMade[I] * C1_CostPerGlassDollars)
+                        if (Stands[I].S_SignsMade * S3_CostPerSign <= Stands[I].Assets - Stands[I].L_GlassesMade * C1_CostPerGlassDollars)
                         {
                             break;
                         }
@@ -329,11 +313,10 @@ namespace NegativeEddy.LemonadeStand
                         // 975  PRINT
                         Print();
                         // 980 STI = A(I) - L(I) * C1: GOSUB 4000
-                        STI = Assets[I] - L_GlassesMade[I] * C1_CostPerGlassDollars;
-                        Sub4000_AssetsToString();
+                        decimal tmp = Stands[I].Assets - Stands[I].L_GlassesMade * C1_CostPerGlassDollars;
                         // 985  PRINT "THINK AGAIN, YOU HAVE ONLY ";STI$
                         // 990  PRINT "IN CASH LEFT AFTER MAKING YOUR LEMONADE."
-                        Print($"THINK AGAIN, YOU HAVE ONLY {STI}");
+                        Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2}");
                         Print("IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
                         // 1000  GOTO 950
                     }
@@ -346,10 +329,10 @@ namespace NegativeEddy.LemonadeStand
                         Print("WHAT PRICE (IN CENTS) DO YOU WISH TO");
                         Print("CHARGE FOR LEMONADE ");
                         // 1015  INPUT P(I)
-                        P_PricePerGlassCents[I] = int.Parse(_io.GetInput());
+                        Stands[I].P_PricePerGlassCents = int.Parse(_io.GetInput());
                         // 1020	IF P(I) < 0 OR P(I) > 100 THEN 1022
                         // 1021	GOTO 1024
-                        if (P_PricePerGlassCents[I] <= 0 || P_PricePerGlassCents[I] >= 100)
+                        if (Stands[I].P_PricePerGlassCents <= 0 || Stands[I].P_PricePerGlassCents >= 100)
                         {
                             // 1022	PRINT "COME ON, BE REASONABLE!!! TRY AGAIN."
                             Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
@@ -405,58 +388,58 @@ namespace NegativeEddy.LemonadeStand
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 // 1186	IF A(I) < 0 THEN A(I) = 0
-                if (Assets[I] < 0)
+                if (Stands[I].Assets < 0)
                 {
-                    Assets[I] = 0;
+                    Stands[I].Assets = 0;
                 }
 
                 // 1187	IF R2 = 2 THEN 1260
                 if (R2 != 2)
                 {
                     // 1190  IF P(I) >  = P9 THEN 1220
-                    if (P_PricePerGlassCents[I] < P9_MaxPricePerGlassCents)
+                    if (Stands[I].P_PricePerGlassCents < P9_MaxPricePerGlassCents)
                     {
                         // 1200 N1 = (P9 - P(I)) / P9 * .8 * S2 + S2
-                        N1 = (P9_MaxPricePerGlassCents - P_PricePerGlassCents[I]) / P9_MaxPricePerGlassCents * .8M * S2 + S2;
+                        N1 = (P9_MaxPricePerGlassCents - Stands[I].P_PricePerGlassCents) / P9_MaxPricePerGlassCents * .8M * S2 + S2;
                         // 1210  GOTO 1230
                     }
                     else
                     {
                         // 1220 N1 = ((P9 ^ 2) * S2 / P(I) ^ 2)
-                        N1 = P9_MaxPricePerGlassCents * P9_MaxPricePerGlassCents * S2 / (P_PricePerGlassCents[I] * P_PricePerGlassCents[I]);
+                        N1 = P9_MaxPricePerGlassCents * P9_MaxPricePerGlassCents * S2 / (Stands[I].P_PricePerGlassCents * Stands[I].P_PricePerGlassCents);
                     }
                     // 1230 W =  - S(I) * C9
-                    double W = -S_SignsMade[I] * C9;
+                    double W = -Stands[I].S_SignsMade * C9;
                     // 1232 V = 1 - ( EXP (W)     * C2)
                     double V = 1 - Math.Exp(W) * C2;
                     // 1234 N2 = R1 * (N1 + (N1 * V))
                     double tmp = R1_WeatherFactor * ((double)N1 + (double)N1 * V);
                     // 1240 N2 =  INT (N2 * G(I))
-                    N2_GlassesSold = (int)(tmp * G_RuinedByThunderstorm[I]);
+                    N2_GlassesSold = (int)(tmp * Stands[I].G_RuinedByThunderstorm);
                     // 1250  IF N2 <  = L(I) THEN 1270
-                    if (N2_GlassesSold > L_GlassesMade[I])
+                    if (N2_GlassesSold > Stands[I].L_GlassesMade)
                     {
                         // repeat line 1260 logic here
-                        N2_GlassesSold = L_GlassesMade[I];
+                        N2_GlassesSold = Stands[I].L_GlassesMade;
                     }
                 }
                 else
                 {
                     // 1260 N2 = L(I)
-                    N2_GlassesSold = L_GlassesMade[I];
+                    N2_GlassesSold = Stands[I].L_GlassesMade;
                 }
 
                 // 1270 M = N2 * P(I) * .01
-                M_Income = N2_GlassesSold * P_PricePerGlassCents[I] * .01M;
+                M_Income = N2_GlassesSold * Stands[I].P_PricePerGlassCents * .01M;
                 // 1280 E = S(I) * S3 + L(I) * C
-                E_Expenses = S_SignsMade[I] * S3_CostPerSign + L_GlassesMade[I] * C1_CostPerGlassDollars;
+                E_Expenses = Stands[I].S_SignsMade * S3_CostPerSign + Stands[I].L_GlassesMade * C1_CostPerGlassDollars;
                 // 1290 P1 = M - E
                 P1_Profit = M_Income - E_Expenses;
                 // 1300 A(I) = A(I) + P1
-                Assets[I] = Assets[I] + P1_Profit;
+                Stands[I].Assets = Stands[I].Assets + P1_Profit;
 
                 // 1310  IF H(I) = 1 THEN 2300
-                if (H[I] == 1)
+                if (Stands[I].H == 1)
                 {
                     Sub2300_Thunderstorm_Then1185();
                     continue;   // to 1185
@@ -464,7 +447,7 @@ namespace NegativeEddy.LemonadeStand
                 // 1320	PRINT
                 Print();
                 // 1321	IF B(I) <  > 1 THEN 1330
-                if (Bankruptcy[I] == 1)
+                if (Stands[I].Bankruptcy == 1)
                 {
                     // 1326	PRINT "STAND ";I;: PRINT "   BANKRUPT": GOSUB 18000
                     Print($"STAND {I}");
@@ -477,7 +460,7 @@ namespace NegativeEddy.LemonadeStand
                     // 1330  GOSUB 5000
                     Sub5000_DailyReport();
                     // 1350  IF A(I) > C / 100 THEN 1390
-                    if (Assets[I] <= C_CostPerGlassCents / 100)
+                    if (Stands[I].Assets <= C_CostPerGlassCents / 100)
                     {
                         // 1360  PRINT "STAND ";I
                         Print($"STAND {I}");
@@ -486,11 +469,11 @@ namespace NegativeEddy.LemonadeStand
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
                         // 1380 B(I) = 1
-                        Bankruptcy[I] = 1;
+                        Stands[I].Bankruptcy = 1;
                         // 1382  GOSUB 18000: HOME
                         Sub18000_SpaceToContinue();
                         // 1385  IF N = 1 AND B(1) = 1 THEN 31111
-                        if (N_NumberOfPlayers == 1 && Bankruptcy[1] == 1)
+                        if (N_NumberOfPlayers == 1 && Stands[0].Bankruptcy == 1)
                         {
                             Sub31111_Exit();
                         }
@@ -596,7 +579,7 @@ namespace NegativeEddy.LemonadeStand
             // 2370  FOR J = 1 TO N:G(J) = 0: NEXT
             for (int J = 0; J < N_NumberOfPlayers; J++)
             {
-                G_RuinedByThunderstorm[J] = 0;
+                Stands[J].G_RuinedByThunderstorm = 0;
             }
             // 2380  GOTO 1185
         }
@@ -620,20 +603,6 @@ namespace NegativeEddy.LemonadeStand
 
         // 3000  END
 
-        private decimal STI;
-        private string STIS;
-        private void Sub4000_AssetsToString()
-        {
-            // 4000  REM   STI => DOLLARS.CENTS
-            // 4010 STI =  INT (STI * 100 + .5) / 100
-            STI = Math.Round(STI, 2);
-            // 4020 STI$ = "$" +  STR$ (STI)
-            STIS = STI.ToString("C2");
-            // 4030  IF STI =  INT (STI) THEN STI$ = STI$ + ".0"
-            // 4040  IF STI =  INT (STI * 10 + .5) / 10 THEN STI$ = STI$ + "0"
-            // 4050  RETURN
-        }
-
         private int N2_GlassesSold;
         private decimal N1;
         private decimal M_Income;
@@ -653,25 +622,20 @@ namespace NegativeEddy.LemonadeStand
             Print();
 
             // 5012 STI = P(I) / 100: GOSUB 4000: PRINT STI$; TAB( 7);"PER GLASS";
-            STI = P_PricePerGlassCents[I] / 100.0M;
-            Sub4000_AssetsToString();
-            Print($"{STIS} PER GLASS");
+            var tmp = Stands[I].P_PricePerGlassCents / 100.0M;
+            Print($"{tmp:C2} PER GLASS");
 
             // 5014 STI = M: GOSUB 4000: PRINT  TAB( 27);"INCOME ";STI$
-            STI = M_Income;
-            Sub4000_AssetsToString();
-            Print($"INCOME {STIS}");
+            Print($"INCOME {M_Income:C2}");
 
             // 5016  PRINT : PRINT : PRINT "  ";L(I); TAB( 7);"GLASSES MADE": PRINT
             Print();
             Print();
-            Print($"  {L_GlassesMade[I]} GLASSES MADE");
+            Print($"  {Stands[I].L_GlassesMade} GLASSES MADE");
             Print();
 
             // 5020 STI = E: GOSUB 4000: PRINT "  ";S(I); TAB( 7);"SIGNS MADE"; TAB( 25);"EXPENSES ";STI $: PRINT : PRINT
-            STI = E_Expenses;
-            Sub4000_AssetsToString();
-            Print($"  {S_SignsMade[I]} SIGNS MADE\t EXPENSES {STIS}");
+            Print($"  {Stands[I].S_SignsMade} SIGNS MADE\t EXPENSES {E_Expenses:C2}");
             Print();
             Print();
 
@@ -680,7 +644,7 @@ namespace NegativeEddy.LemonadeStand
             Print();
 
             // 5040 STI = A(I): GOSUB 4000: PRINT  TAB( 16);"ASSETS  ";STI$
-            Print($"  ASSETS  {Assets[I]:C}");
+            Print($"  ASSETS  {Stands[I].Assets:C}");
 
             // 5060  GOSUB 18000
             Sub18000_SpaceToContinue();

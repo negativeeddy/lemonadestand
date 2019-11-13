@@ -20,11 +20,11 @@ namespace NegativeEddy.LemonadeStand.Tests
             var stand = new LemonadeStand.Game(new TestIO(_output), new ConstantRandom(0));
             stand.Init();
             stand.Step();
-            Assert.Equal(1.85M, stand.Assets[0]);
+            Assert.Equal(1.85M, stand.Stands[0].Assets);
             stand.Step();
-            Assert.Equal(1.70M, stand.Assets[0]);
+            Assert.Equal(1.70M, stand.Stands[0].Assets);
             stand.Step();
-            Assert.Equal(1.35M, stand.Assets[0]);
+            Assert.Equal(1.35M, stand.Stands[0].Assets);
         }
     }
 
