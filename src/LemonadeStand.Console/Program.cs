@@ -7,7 +7,11 @@ namespace NegativeEddy.LemonadeStand.Console
         static void Main(string[] args)
         {
             var game = new Game(new ConsoleIO(), new NetStandardRandom());
-            game.Run();
+            game.Init();
+            //while(game.Step())
+            //{
+            //}
+            game.Step();
         }
     }
 }

@@ -6,6 +6,6 @@ namespace NegativeEddy.LemonadeStand
     {
         public Action<string> Output { get; }
 
-        public Func<string> GetInput { get; }
+        public string GetInput();
     }
 }

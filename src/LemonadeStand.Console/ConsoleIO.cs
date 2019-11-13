@@ -6,6 +6,6 @@ namespace NegativeEddy.LemonadeStand.Console
     {
         public Action<string> Output => text => System.Console.Write(text);
 
-        public Func<string> GetInput => System.Console.ReadLine;
+        public string GetInput() => System.Console.ReadLine();
     }
 }

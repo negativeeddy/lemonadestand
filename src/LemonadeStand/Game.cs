@@ -4,8 +4,8 @@ namespace NegativeEddy.LemonadeStand
 {
     public class Game
     {
-        private IGameIO _io;
-        private IRandom _random;
+        private readonly IGameIO _io;
+        private readonly IRandom _random;
 
         public Game(IGameIO io, IRandom random)
         {
@@ -23,18 +23,27 @@ namespace NegativeEddy.LemonadeStand
             _io.Output(Environment.NewLine);
         }
 
-        private int D_Day; // Day of simulation?
-        private decimal[] A_Assetts; // A(i): Assets (cash on hand, in dollars) 
-        private int C_CostPerGlassCents; // C: cost of lemonade per glass, in cents 
+        /// <summary>
+        /// Day of simulation
+        /// </summary>
+        public int Day { get; set; }
+
+        /// <summary>
+        /// Assets (cash on hand, in dollars)
+        /// </summary>
+        public decimal[] Assets { get; set; } 
         private int[] G_RuinedByThunderstorm;// G(i): normally 1; 0 if everything is ruined by thunderstorm 
-        private int P9_MaxPricePerGlassCents;
-        private decimal[] H; // H(i): apparently intended to relate to storms, but never assigned a value 
         private int[] Bankruptcy;
-        private int I; // I: current player number, 1 to N 
         private int[] L_GlassesMade; // L(i): number of glasses of lemonade made by player i 
+        private int[] P_PricePerGlassCents; //P(i): Price charged for lemonade, per glass, in cents 
+        private int[] S_SignsMade; // S(i): Number of signs made by player i 
+        private decimal[] H; // H(i): apparently intended to relate to storms, but never assigned a value 
+
+        private int C_CostPerGlassCents; // C: cost of lemonade per glass, in cents 
+        private int P9_MaxPricePerGlassCents;
+        private int I; // I: current player number, 1 to N 
         private string AS;
         private int N_NumberOfPlayers; //N: number of players 
-        private int[] P_PricePerGlassCents; //P(i): Price charged for lemonade, per glass, in cents 
         // R1: weather factor; 
         // 1 for good weather,
         // 0>R<1 for poor weather;   
@@ -42,7 +51,6 @@ namespace NegativeEddy.LemonadeStand
         private double R1_WeatherFactor;
         private int R2; // R2: set to 2 half the time when street department is working;   indicates that street crew bought all lemonade at lunch 
         private int R3; // R3: always equal to 0; not used 
-        private int[] S_SignsMade; // S(i): Number of signs made by player i 
         private decimal S3_CostPerSign; // S3: cost per advertising sign, in dollars 
         private int S2; // number of players?
         private decimal InitialAssets; // initial cash?
@@ -53,7 +61,7 @@ namespace NegativeEddy.LemonadeStand
         private int X1; // X1: set to 1 when it's cloudy; not sure what the intent was, but has   no actual effect since line 2100 is unreachable. 
         private int X2; // X2: set to 1 when the street crew has worked and was not thirsty;   apparently intended to prevent street crews from coming again,   but doesn't actually work since line 2200 is unreachable.
 
-        public void Run()
+        public void Init()
         {
             // 1  LOMEM: 14080
             // 5  GOSUB 10000
@@ -85,25 +93,22 @@ namespace NegativeEddy.LemonadeStand
             // 175 A2 = 2.00
             // 194	C9 = .5
             // 195	C2 = 1
-            A_Assetts = new decimal[30];
+            Assets = new decimal[30];
             L_GlassesMade = new int[30];
             H = new decimal[30];
             Bankruptcy = new int[30];
             S_SignsMade = new int[30];
             P_PricePerGlassCents = new int[30];
             G_RuinedByThunderstorm = new int[30];
-            D_Day = 0;
+
+            Day = 0;
             P9_MaxPricePerGlassCents = 10;
             S3_CostPerSign = .15M;
             S2 = 30;
             InitialAssets = 2.00M;
             C9 = 0.5;
             C2 = 1;
-            Start();
-        }
 
-        private void Start()
-        {
             // 300  REM   START OF GAME
             // 310  GOSUB 12000
             Sub12000_TitlePage();
@@ -111,7 +116,7 @@ namespace NegativeEddy.LemonadeStand
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 Bankruptcy[I] = 0;
-                A_Assetts[I] = InitialAssets;
+                Assets[I] = InitialAssets;
             }
             // 320  IF A$ = "Y" THEN  GOSUB 13000: GOTO 400
             // 330  GOSUB 14000
@@ -124,18 +129,12 @@ namespace NegativeEddy.LemonadeStand
                 Sub14000_ContinueOldGame();
             }
 
-            while (true)
-            {
-                // the end of sub400 calls itself so use this while loop instead
-                // the true branch above jumps there, the false branch falls through to it
-                Sub400_WeatherReport();
-            }
         }
 
         private int J_ChanceOfRain;
         private int X4;
 
-        private void Sub400_WeatherReport()
+        public bool Step()
         {
             // 400  REM   WEATHER REPORT
             // 410 SC =  RND (1)
@@ -157,7 +156,7 @@ namespace NegativeEddy.LemonadeStand
             }
 
             // 460  IF D < 3 THEN SC = 2
-            if (D_Day < 3)
+            if (Day < 3)
             {
                 SC_SkyColor = 2;
             }
@@ -166,27 +165,29 @@ namespace NegativeEddy.LemonadeStand
 
             // 490  TEXT : HOME
             Sub500_StartOfNewDay();
+
+            return true;
         }
 
         private void Sub500_StartOfNewDay()
         {
             // 500  REM   START OF NEW DAY
             // 510 D = D + 1
-            D_Day++;
+            Day++;
             // 520  PRINT "ON DAY ";D;", THE COST OF LEMONADE IS ";
-            Print($"ON DAY {D_Day}, THE COST OF LEMONADE IS ");
+            Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
             // 540 C = 2
             // : IF D > 2 THEN C = 4
             // 550  IF D > 6 THEN C = 5
-            if (D_Day < 3)
+            if (Day < 3)
             {
                 C_CostPerGlassCents = 2;
             }
-            else if (D_Day < 7)
+            else if (Day < 7)
             {
                 C_CostPerGlassCents = 4;
             }
-            else 
+            else
             {
                 C_CostPerGlassCents = 5;
             }
@@ -208,18 +209,18 @@ namespace NegativeEddy.LemonadeStand
             // 620  PRINT "(YOUR MOTHER QUIT GIVING YOU FREE SUGAR)"
             // 650  IF D <  > 7 THEN 700
             // 660  PRINT "(THE PRICE OF LEMONADE MIX JUST WENT UP)"
-            if (D_Day == 3)
+            if (Day == 3)
             {
                 Print("(YOUR MOTHER QUIT GIVING YOU FREE SUGAR)");
             }
-            else if (D_Day == 7)
+            else if (Day == 7)
             {
                 Print("(THE PRICE OF LEMONADE MIX JUST WENT UP)");
             }
 
             // 700  REM   AFTER 2 DAYS THINGS CAN HAPPEN
             // 710  IF D > 2 THEN 2000
-            if (D_Day > 2)
+            if (Day > 2)
             {
                 Sub2000_RandomEvents();
             }
@@ -231,8 +232,6 @@ namespace NegativeEddy.LemonadeStand
             // 810  FOR I = 1 TO N
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
-                // 815 A(I) = A(I) + .000000001
-                A_Assetts[I] = A_Assetts[I] + 0.000000001M;
                 // 820 G(I) = 1:H(I) = 0
                 G_RuinedByThunderstorm[I] = 1;
                 H[I] = 0;
@@ -240,7 +239,7 @@ namespace NegativeEddy.LemonadeStand
                 // : GOSUB 4000
                 // : PRINT "LEMONADE STAND ";I; TAB( 26);"ASSETS ";STI$ 
                 // 855  PRINT
-                STI = A_Assetts[I];
+                STI = Assets[I];
                 Sub4000_AssetsToString();
                 Print($"LEMONADE STAND {I} ASSETS {STIS}");
                 Print();
@@ -252,7 +251,7 @@ namespace NegativeEddy.LemonadeStand
                     Print("YOU ARE BANKRUPT, NO DECISIONS");
                     Print("FOR YOU TO MAKE.");
                     // 876	IF N = 1 AND A(1) < C THEN 31111
-                    if (N_NumberOfPlayers == 1 && A_Assetts[1] < C_CostPerGlassCents)
+                    if (N_NumberOfPlayers == 1 && Assets[0] < C_CostPerGlassCents)
                     {
                         Sub31111_Exit();
                     }
@@ -284,7 +283,7 @@ namespace NegativeEddy.LemonadeStand
                         // dont need this, input is always an integer
 
                         // 910  IF L(I) * C1 <  = A(I) THEN 950
-                        if (L_GlassesMade[I] * C1_CostPerGlassDollars <= A_Assetts[I])
+                        if (L_GlassesMade[I] * C1_CostPerGlassDollars <= Assets[I])
                         {
                             // user can purchase that amount of lemonade
                             break;
@@ -322,7 +321,7 @@ namespace NegativeEddy.LemonadeStand
                         // S[I] is always an int, dont need this check
 
                         // 970  IF S(I) * S3 <  = A(I) - L(I) * C1 THEN 1010
-                        if (S_SignsMade[I] * S3_CostPerSign <= A_Assetts[I] - L_GlassesMade[I] * C1_CostPerGlassDollars)
+                        if (S_SignsMade[I] * S3_CostPerSign <= Assets[I] - L_GlassesMade[I] * C1_CostPerGlassDollars)
                         {
                             break;
                         }
@@ -330,7 +329,7 @@ namespace NegativeEddy.LemonadeStand
                         // 975  PRINT
                         Print();
                         // 980 STI = A(I) - L(I) * C1: GOSUB 4000
-                        STI = A_Assetts[I] - L_GlassesMade[I] * C1_CostPerGlassDollars;
+                        STI = Assets[I] - L_GlassesMade[I] * C1_CostPerGlassDollars;
                         Sub4000_AssetsToString();
                         // 985  PRINT "THINK AGAIN, YOU HAVE ONLY ";STI$
                         // 990  PRINT "IN CASH LEFT AFTER MAKING YOUR LEMONADE."
@@ -406,9 +405,9 @@ namespace NegativeEddy.LemonadeStand
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 // 1186	IF A(I) < 0 THEN A(I) = 0
-                if (A_Assetts[I] < 0)
+                if (Assets[I] < 0)
                 {
-                    A_Assetts[I] = 0;
+                    Assets[I] = 0;
                 }
 
                 // 1187	IF R2 = 2 THEN 1260
@@ -454,7 +453,7 @@ namespace NegativeEddy.LemonadeStand
                 // 1290 P1 = M - E
                 P1_Profit = M_Income - E_Expenses;
                 // 1300 A(I) = A(I) + P1
-                A_Assetts[I] = A_Assetts[I] + P1_Profit;
+                Assets[I] = Assets[I] + P1_Profit;
 
                 // 1310  IF H(I) = 1 THEN 2300
                 if (H[I] == 1)
@@ -478,7 +477,7 @@ namespace NegativeEddy.LemonadeStand
                     // 1330  GOSUB 5000
                     Sub5000_DailyReport();
                     // 1350  IF A(I) > C / 100 THEN 1390
-                    if (A_Assetts[I] <= C_CostPerGlassCents / 100)
+                    if (Assets[I] <= C_CostPerGlassCents / 100)
                     {
                         // 1360  PRINT "STAND ";I
                         Print($"STAND {I}");
@@ -645,7 +644,7 @@ namespace NegativeEddy.LemonadeStand
         {
             // 5000  VTAB 6: POKE 34,5
             // 5002  PRINT "   DAY ";D; TAB( 30);"STAND ";I: PRINT : PRINT
-            Print($"   DAY {D_Day} STAND {I}");
+            Print($"   DAY {Day} STAND {I}");
             Print();
             Print();
 
@@ -681,7 +680,7 @@ namespace NegativeEddy.LemonadeStand
             Print();
 
             // 5040 STI = A(I): GOSUB 4000: PRINT  TAB( 16);"ASSETS  ";STI$
-            Print($"  ASSETS  {A_Assetts[I]:C}");
+            Print($"  ASSETS  {Assets[I]:C}");
 
             // 5060  GOSUB 18000
             Sub18000_SpaceToContinue();
