@@ -8,10 +8,9 @@ namespace NegativeEddy.LemonadeStand.Console
         {
             var game = new Game(new ConsoleIO(), new NetStandardRandom());
             game.Init();
-            //while(game.Step())
-            //{
-            //}
-            game.Step();
+            while (game.Step())
+            {
+            }
         }
     }
 }
