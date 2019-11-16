@@ -47,6 +47,11 @@ namespace NegativeEddy.LemonadeStand
         private decimal CostPerGlassDollars;
         private int C2;
 
+        private int GlassesSold;
+        private decimal N1;
+        private decimal Expenses;
+        private decimal Profit;
+
         /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy).  // TODO: make this an enum?
         /// originally SC: 
@@ -259,21 +264,21 @@ namespace NegativeEddy.LemonadeStand
                     double W = -Stands[I].SignsMade * C9;
                     double V = 1 - Math.Exp(W) * C2;
                     double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
-                    N2_GlassesSold = Stands[I].RuinedByThunderstorm ? 0 : (int)tmp;
-                    if (N2_GlassesSold > Stands[I].GlassesMade)
+                    GlassesSold = Stands[I].RuinedByThunderstorm ? 0 : (int)tmp;
+                    if (GlassesSold > Stands[I].GlassesMade)
                     {
-                        N2_GlassesSold = Stands[I].GlassesMade;
+                        GlassesSold = Stands[I].GlassesMade;
                     }
                 }
                 else
                 {
-                    N2_GlassesSold = Stands[I].GlassesMade;
+                    GlassesSold = Stands[I].GlassesMade;
                 }
 
-                M_Income = N2_GlassesSold * Stands[I].PricePerGlassCents * .01M;
-                E_Expenses = Stands[I].SignsMade * CostPerSignDollars + Stands[I].GlassesMade * CostPerGlassDollars;
-                P1_Profit = M_Income - E_Expenses;
-                Stands[I].Assets = Stands[I].Assets + P1_Profit;
+                decimal Income = GlassesSold * Stands[I].PricePerGlassCents * .01M;
+                Expenses = Stands[I].SignsMade * CostPerSignDollars + Stands[I].GlassesMade * CostPerGlassDollars;
+                Profit = Income - Expenses;
+                Stands[I].Assets = Stands[I].Assets + Profit;
 
                 if (Stands[I].H == 1)
                 {
@@ -289,7 +294,7 @@ namespace NegativeEddy.LemonadeStand
                 }
                 else
                 {
-                    Sub5000_DailyReport();
+                    Sub5000_DailyReport(Income);
                     if (Stands[I].Assets <= CostPerGlassCents / 100)
                     {
                         Print($"STAND {I}");
@@ -371,36 +376,30 @@ namespace NegativeEddy.LemonadeStand
             WeatherFactor = 2;
         }
 
-        private int N2_GlassesSold;
-        private decimal N1;
-        private decimal M_Income;
-        private decimal E_Expenses;
-        private decimal P1_Profit;
-
-        private void Sub5000_DailyReport()
+        private void Sub5000_DailyReport(decimal Income)
         {
             Print($"   DAY {Day} STAND {I}");
             Print();
             Print();
 
-            Print($"  {N2_GlassesSold} GLASSES SOLD");
+            Print($"  {GlassesSold} GLASSES SOLD");
             Print();
 
             var tmp = Stands[I].PricePerGlassCents / 100.0M;
             Print($"{tmp:C2} PER GLASS");
 
-            Print($"INCOME {M_Income:C2}");
+            Print($"INCOME {Income:C2}");
 
             Print();
             Print();
             Print($"  {Stands[I].GlassesMade} GLASSES MADE");
             Print();
 
-            Print($"  {Stands[I].SignsMade} SIGNS MADE\t EXPENSES {E_Expenses:C2}");
+            Print($"  {Stands[I].SignsMade} SIGNS MADE\t EXPENSES {Expenses:C2}");
             Print();
             Print();
 
-            Print($"  PROFIT {P1_Profit:C}");
+            Print($"  PROFIT {Profit:C}");
             Print();
 
             Print($"  ASSETS  {Stands[I].Assets:C}");
