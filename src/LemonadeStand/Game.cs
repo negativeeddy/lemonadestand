@@ -219,7 +219,7 @@ namespace NegativeEddy.LemonadeStand
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 // 820 G(I) = 1:H(I) = 0
-                Stands[I].G_RuinedByThunderstorm = 1;
+                Stands[I].RuinedByThunderstorm = false;
                 Stands[I].H = 0;
                 // 850 STI = A(I)
                 // : GOSUB 4000
@@ -415,7 +415,7 @@ namespace NegativeEddy.LemonadeStand
                     // 1234 N2 = R1 * (N1 + (N1 * V))
                     double tmp = R1_WeatherFactor * ((double)N1 + (double)N1 * V);
                     // 1240 N2 =  INT (N2 * G(I))
-                    N2_GlassesSold = (int)(tmp * Stands[I].G_RuinedByThunderstorm);
+                    N2_GlassesSold = Stands[I].RuinedByThunderstorm ? 0 : (int)tmp;
                     // 1250  IF N2 <  = L(I) THEN 1270
                     if (N2_GlassesSold > Stands[I].L_GlassesMade)
                     {
@@ -579,7 +579,7 @@ namespace NegativeEddy.LemonadeStand
             // 2370  FOR J = 1 TO N:G(J) = 0: NEXT
             for (int J = 0; J < N_NumberOfPlayers; J++)
             {
-                Stands[J].G_RuinedByThunderstorm = 0;
+                Stands[J].RuinedByThunderstorm = true;
             }
             // 2380  GOTO 1185
         }
@@ -749,16 +749,20 @@ namespace NegativeEddy.LemonadeStand
             Print("TO YOU (THE OTHER STANDS' SALES WILL NOT");
             Print("AFFECT YOUR BUSINESS IN ANY WAY). IF YOU");
             Print("MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
-            Print();
-            Print("ARE YOU STARTING A NEW GAME? (YES OR NO)");
 
             do
             {
+                Print();
+                Print("ARE YOU STARTING A NEW GAME? (YES OR NO)");
+
                 // 12200  VTAB 21: CALL  - 958
                 // : INPUT "TYPE YOUR ANSWER AND HIT RETURN ==> ";A$ 
                 AS = _io.GetInput();
                 // 12210 A$ =  LEFT$ (A$,1)
-                AS = AS.Substring(0, 1);
+                if (AS.Length > 0)
+                {
+                    AS = AS.Substring(0, 1).ToUpper();
+                }
                 // : IF A$ <  > "Y" AND A$ <  > "N" THEN  PRINT CHR$ (7);: GOTO 12200
             }
             while (AS != "Y" && AS != "N");
