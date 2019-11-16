@@ -4,6 +4,11 @@
     {
         public class Stand
         {
+            public Stand(decimal assets)
+            {
+                Assets = assets;
+            }
+
             /// <summary>
             /// Assets (cash on hand, in dollars)
             /// </summary>
@@ -13,7 +18,7 @@
             /// originally G(i)
             /// </summary>
             public bool RuinedByThunderstorm { get; set; } // G(i): normally 1; 0 if everything is ruined by thunderstorm 
-            public int Bankruptcy { get; set; }
+            public bool IsBankrupt { get; set; }
             public int L_GlassesMade { get; set; } // L(i): number of glasses of lemonade made by player i 
             public int P_PricePerGlassCents { get; set; } //P(i): Price charged for lemonade, per glass, in cents 
             public int S_SignsMade { get; set; } // S(i): Number of signs made by player i 

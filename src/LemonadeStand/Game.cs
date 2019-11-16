@@ -100,9 +100,7 @@ namespace NegativeEddy.LemonadeStand
             // : FOR I = 1 TO N:B(I) = 0:A(I) = A2: NEXT
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
-                Stands[I] = new Stand();
-                Stands[I].Bankruptcy = 0;
-                Stands[I].Assets = InitialAssets;
+                Stands[I] = new Stand(InitialAssets);
             }
             // 320  IF A$ = "Y" THEN  GOSUB 13000: GOTO 400
             // 330  GOSUB 14000
@@ -228,7 +226,7 @@ namespace NegativeEddy.LemonadeStand
                 Print($"LEMONADE STAND {I} ASSETS {Stands[I].Assets:C2}");
                 Print();
                 // 860  IF B(I) = 0 THEN 890
-                if (Stands[I].Bankruptcy != 0)
+                if (Stands[I].IsBankrupt)
                 {
                     // 870  PRINT "YOU ARE BANKRUPT, NO DECISIONS"
                     // 875	PRINT "FOR YOU TO MAKE."
@@ -447,7 +445,7 @@ namespace NegativeEddy.LemonadeStand
                 // 1320	PRINT
                 Print();
                 // 1321	IF B(I) <  > 1 THEN 1330
-                if (Stands[I].Bankruptcy == 1)
+                if (Stands[I].IsBankrupt)
                 {
                     // 1326	PRINT "STAND ";I;: PRINT "   BANKRUPT": GOSUB 18000
                     Print($"STAND {I}");
@@ -469,11 +467,11 @@ namespace NegativeEddy.LemonadeStand
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
                         // 1380 B(I) = 1
-                        Stands[I].Bankruptcy = 1;
+                        Stands[I].IsBankrupt = true;
                         // 1382  GOSUB 18000: HOME
                         Sub18000_SpaceToContinue();
                         // 1385  IF N = 1 AND B(1) = 1 THEN 31111
-                        if (N_NumberOfPlayers == 1 && Stands[0].Bankruptcy == 1)
+                        if (N_NumberOfPlayers == 1 && Stands[0].IsBankrupt)
                         {
                             Sub31111_Exit();
                         }
@@ -973,7 +971,17 @@ namespace NegativeEddy.LemonadeStand
             // 31113	IF  PEEK (994) +  PEEK (1001) = 192 THEN  CALL 976 31114  TEXT : HOME 
             // : TEXT 
             // : END
-            throw new Exception("Exiting");
+            throw new GameOverException("Exiting");
+        }
+    }
+
+    /// <summary>
+    /// Temporary solution to the fact that the original source just quit the process
+    /// </summary>
+    public class GameOverException : Exception
+    {
+        public GameOverException(string message) : base(message)
+        {
         }
     }
 }
