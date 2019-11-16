@@ -47,10 +47,7 @@ namespace NegativeEddy.LemonadeStand
         private decimal CostPerGlassDollars;
         private int C2;
 
-        private int GlassesSold;
         private decimal N1;
-        private decimal Expenses;
-        private decimal Profit;
 
         /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy).  // TODO: make this an enum?
@@ -251,6 +248,8 @@ namespace NegativeEddy.LemonadeStand
                     Stands[I].Assets = 0;
                 }
 
+                int GlassesSold;
+
                 if (R2 != 2)
                 {
                     if (Stands[I].PricePerGlassCents < MaxPricePerGlassCents)
@@ -276,8 +275,8 @@ namespace NegativeEddy.LemonadeStand
                 }
 
                 decimal Income = GlassesSold * Stands[I].PricePerGlassCents * .01M;
-                Expenses = Stands[I].SignsMade * CostPerSignDollars + Stands[I].GlassesMade * CostPerGlassDollars;
-                Profit = Income - Expenses;
+                decimal Expenses = Stands[I].SignsMade * CostPerSignDollars + Stands[I].GlassesMade * CostPerGlassDollars;
+                decimal Profit = Income - Expenses;
                 Stands[I].Assets = Stands[I].Assets + Profit;
 
                 if (Stands[I].H == 1)
@@ -294,7 +293,19 @@ namespace NegativeEddy.LemonadeStand
                 }
                 else
                 {
-                    Sub5000_DailyReport(Income);
+                    Sub5000_DailyReport(new DailyResult
+                    {
+                        Day = Day,
+                        Stand = Stands[I],
+                        StandNumber = I,
+                        Income = Income,
+                        Expenses = Expenses,
+                        Profit = Profit,
+                        GlassesSold = GlassesSold,
+                    });
+
+                    Sub18000_SpaceToContinue();
+
                     if (Stands[I].Assets <= CostPerGlassCents / 100)
                     {
                         Print($"STAND {I}");
@@ -376,35 +387,45 @@ namespace NegativeEddy.LemonadeStand
             WeatherFactor = 2;
         }
 
-        private void Sub5000_DailyReport(decimal Income)
+        private struct DailyResult
         {
-            Print($"   DAY {Day} STAND {I}");
+            public int Day;
+            public Stand Stand;
+            public int StandNumber;
+            public decimal Income;
+            public decimal Profit;
+            public decimal Expenses;
+            public int GlassesSold;                
+        }
+
+        private void Sub5000_DailyReport(DailyResult result)
+        {
+            Print($"   DAY {result.Day} STAND {result.StandNumber}");
             Print();
             Print();
 
-            Print($"  {GlassesSold} GLASSES SOLD");
+            Print($"  {result.GlassesSold} GLASSES SOLD");
             Print();
 
-            var tmp = Stands[I].PricePerGlassCents / 100.0M;
+            var tmp = result.Stand.PricePerGlassCents / 100.0M;
             Print($"{tmp:C2} PER GLASS");
 
-            Print($"INCOME {Income:C2}");
+            Print($"INCOME {result.Income:C2}");
 
             Print();
             Print();
-            Print($"  {Stands[I].GlassesMade} GLASSES MADE");
+            Print($"  {result.Stand.GlassesMade} GLASSES MADE");
             Print();
 
-            Print($"  {Stands[I].SignsMade} SIGNS MADE\t EXPENSES {Expenses:C2}");
+            Print($"  {result.Stand.SignsMade} SIGNS MADE\t EXPENSES {result.Expenses:C2}");
             Print();
             Print();
 
-            Print($"  PROFIT {Profit:C}");
+            Print($"  PROFIT {result.Profit:C}");
             Print();
 
-            Print($"  ASSETS  {Stands[I].Assets:C}");
+            Print($"  ASSETS  {result.Stand.Assets:C}");
 
-            Sub18000_SpaceToContinue();
         }
 
         private void Sub12000_TitlePage()
