@@ -714,24 +714,6 @@ namespace NegativeEddy.LemonadeStand
             Print("AFFECT YOUR BUSINESS IN ANY WAY). IF YOU");
             Print("MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
 
-            string AS;
-            do
-            {
-                Print();
-                Print("ARE YOU STARTING A NEW GAME? (YES OR NO)");
-
-                // 12200  VTAB 21: CALL  - 958
-                // : INPUT "TYPE YOUR ANSWER AND HIT RETURN ==> ";A$ 
-                AS = _io.GetInput();
-                // 12210 A$ =  LEFT$ (A$,1)
-                if (AS.Length > 0)
-                {
-                    AS = AS.Substring(0, 1).ToUpper();
-                }
-                // : IF A$ <  > "Y" AND A$ <  > "N" THEN  PRINT CHR$ (7);: GOTO 12200
-            }
-            while (AS != "Y" && AS != "N");
-
             do
             {
                 // 12220  VTAB 23: CALL  - 958

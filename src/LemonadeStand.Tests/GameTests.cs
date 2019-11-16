@@ -19,7 +19,7 @@ namespace NegativeEddy.LemonadeStand.Tests
         {
             string[] story = new string[]
             {
-                "Y","1","","",
+                "1","","",
                  // glasses, signs, price, enter
                 "100","0","1","",    // day 1, spend all the money
                 "0","2","1","",      // day 2, just buy signs with the profits from day 1
@@ -48,7 +48,7 @@ namespace NegativeEddy.LemonadeStand.Tests
         {
             string[] story = new string[]
             {
-                "Y","1","","",
+                "1","","",
 
                 "10", // 10 glasses
                 "3", // 3 signs
