@@ -114,7 +114,6 @@ namespace NegativeEddy.LemonadeStand
         }
 
         private int J_ChanceOfRain;
-        private int X4;
 
         public bool Step()
         {
@@ -547,13 +546,10 @@ namespace NegativeEddy.LemonadeStand
             // 2297  GOTO 1185
         }
 
-        private int X3;
-
         private void Sub2300_Thunderstorm_Then1185()
         {
             // 2300  REM   THUNDERSTORM!
             // 2310 X3 = 1:R3 = 0
-            X3 = 1;
             R3 = 0;
             // 2320 SC = 5: GOSUB 15000: TEXT : HOME
             SC_SkyColor = 5;
@@ -583,8 +579,6 @@ namespace NegativeEddy.LemonadeStand
 
         private void Sub2410()
         {
-            // 2410 X4 = 1
-            X4 = 1;
             // 2430  PRINT "A HEAT WAVE IS PREDICTED FOR TODAY!"
             Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
             // 2440 R1 = 2
