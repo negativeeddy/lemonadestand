@@ -30,8 +30,8 @@ namespace NegativeEddy.LemonadeStand
 
         public Stand[] Stands { get; set; }
 
-        private int C_CostPerGlassCents; // C: cost of lemonade per glass, in cents 
-        private int P9_MaxPricePerGlassCents;
+        private int CostPerGlassCents; // C: cost of lemonade per glass, in cents 
+        private int MaxPricePerGlassCents;
         private int I; // I: current player number, 1 to N 
         private string AS;
         private int N_NumberOfPlayers; //N: number of players 
@@ -49,8 +49,6 @@ namespace NegativeEddy.LemonadeStand
         private decimal C1_CostPerGlassDollars;
         private int C2;
         private int SC_SkyColor; // SC: sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
-        private int X1; // X1: set to 1 when it's cloudy; not sure what the intent was, but has   no actual effect since line 2100 is unreachable. 
-        private int X2; // X2: set to 1 when the street crew has worked and was not thirsty;   apparently intended to prevent street crews from coming again,   but doesn't actually work since line 2200 is unreachable.
 
         public void Init()
         {
@@ -87,7 +85,7 @@ namespace NegativeEddy.LemonadeStand
             Stands = new Stand[30];
 
             Day = 0;
-            P9_MaxPricePerGlassCents = 10;
+            MaxPricePerGlassCents = 10;
             S3_CostPerSign = .15M;
             S2 = 30;
             InitialAssets = 2.00M;
@@ -165,22 +163,22 @@ namespace NegativeEddy.LemonadeStand
             // 550  IF D > 6 THEN C = 5
             if (Day < 3)
             {
-                C_CostPerGlassCents = 2;
+                CostPerGlassCents = 2;
             }
             else if (Day < 7)
             {
-                C_CostPerGlassCents = 4;
+                CostPerGlassCents = 4;
             }
             else
             {
-                C_CostPerGlassCents = 5;
+                CostPerGlassCents = 5;
             }
             // 560  PRINT "$.0";C
             // : PRINT
-            Print($"$.0{C_CostPerGlassCents}");
+            Print($"$.0{CostPerGlassCents}");
             Print();
             // 570 C1 = C * .01
-            C1_CostPerGlassDollars = C_CostPerGlassCents * .01M;
+            C1_CostPerGlassDollars = CostPerGlassCents * .01M;
             // 580 R1 = 1
             R1_WeatherFactor = 1;
             Sub600_CurrentEvents();
@@ -233,7 +231,7 @@ namespace NegativeEddy.LemonadeStand
                     Print("YOU ARE BANKRUPT, NO DECISIONS");
                     Print("FOR YOU TO MAKE.");
                     // 876	IF N = 1 AND A(1) < C THEN 31111
-                    if (N_NumberOfPlayers == 1 && Stands[0].Assets < C_CostPerGlassCents)
+                    if (N_NumberOfPlayers == 1 && Stands[0].Assets < CostPerGlassCents)
                     {
                         Sub31111_Exit();
                     }
@@ -395,16 +393,16 @@ namespace NegativeEddy.LemonadeStand
                 if (R2 != 2)
                 {
                     // 1190  IF P(I) >  = P9 THEN 1220
-                    if (Stands[I].PricePerGlassCents < P9_MaxPricePerGlassCents)
+                    if (Stands[I].PricePerGlassCents < MaxPricePerGlassCents)
                     {
                         // 1200 N1 = (P9 - P(I)) / P9 * .8 * S2 + S2
-                        N1 = (P9_MaxPricePerGlassCents - Stands[I].PricePerGlassCents) / P9_MaxPricePerGlassCents * .8M * S2 + S2;
+                        N1 = (MaxPricePerGlassCents - Stands[I].PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
                         // 1210  GOTO 1230
                     }
                     else
                     {
                         // 1220 N1 = ((P9 ^ 2) * S2 / P(I) ^ 2)
-                        N1 = P9_MaxPricePerGlassCents * P9_MaxPricePerGlassCents * S2 / (Stands[I].PricePerGlassCents * Stands[I].PricePerGlassCents);
+                        N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (Stands[I].PricePerGlassCents * Stands[I].PricePerGlassCents);
                     }
                     // 1230 W =  - S(I) * C9
                     double W = -Stands[I].SignsMade * C9;
@@ -458,7 +456,7 @@ namespace NegativeEddy.LemonadeStand
                     // 1330  GOSUB 5000
                     Sub5000_DailyReport();
                     // 1350  IF A(I) > C / 100 THEN 1390
-                    if (Stands[I].Assets <= C_CostPerGlassCents / 100)
+                    if (Stands[I].Assets <= CostPerGlassCents / 100)
                     {
                         // 1360  PRINT "STAND ";I
                         Print($"STAND {I}");
@@ -513,8 +511,6 @@ namespace NegativeEddy.LemonadeStand
                 Print("AND THE WEATHER IS COOLER TODAY.");
                 // 2120 R1 = 1 - J / 100
                 R1_WeatherFactor = 1 - J_ChanceOfRain / 100.0d;
-                // 2130 X1 = 1
-                X1 = 1;
                 // 2140  GOTO 805
                 return;
                 // 2200  IF X2 = 1 THEN 805    { unreachable }
@@ -538,11 +534,8 @@ namespace NegativeEddy.LemonadeStand
                 R2 = 2;
             }
 
-            // 2250 X2 = 1
-            X2 = 1;
             // 2260  GOTO 805
             return;
-
         }
 
         private void Sub2290_StreetCrewsBoughtEverything_Then1185()
