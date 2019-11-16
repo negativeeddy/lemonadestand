@@ -20,11 +20,33 @@
             /// </summary>
             public bool RuinedByThunderstorm { get; set; }  
 
+            /// <summary>
+            /// true if the player is bankrupt and cannot continue
+            /// </summary>
             public bool IsBankrupt { get; set; }
-            public int L_GlassesMade { get; set; } // L(i): number of glasses of lemonade made by player i 
-            public int P_PricePerGlassCents { get; set; } //P(i): Price charged for lemonade, per glass, in cents 
-            public int S_SignsMade { get; set; } // S(i): Number of signs made by player i 
-            public decimal H { get; set; } // H(i): apparently intended to relate to storms, but never assigned a value 
+
+            /// <summary>
+            /// number of glasses of lemonade made by player
+            /// originally L(i)
+            /// </summary>
+            public int GlassesMade { get; set; } 
+
+            /// <summary>
+            /// Price charged for lemonade, per glass, in cents
+            /// originally P(i)
+            /// </summary>
+            public int PricePerGlassCents { get; set; }  
+
+            /// <summary>
+            /// Number of signs made by player
+            /// originally S(i)
+            /// </summary>
+            public int SignsMade { get; set; }
+
+            /// <summary>
+            /// // H(i): apparently intended to relate to storms, but never assigned a value 
+            /// </summary>
+            public decimal H { get; set; } // TODO: probably delete this
         }
     }
 }
