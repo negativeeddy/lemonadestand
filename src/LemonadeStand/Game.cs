@@ -33,7 +33,6 @@ namespace NegativeEddy.LemonadeStand
         private int CostPerGlassCents; // C: cost of lemonade per glass, in cents 
         private int MaxPricePerGlassCents;
         private int I; // I: current player number, 1 to N 
-        private string AS;
         private int N_NumberOfPlayers; //N: number of players 
         // R1: weather factor; 
         // 1 for good weather,
@@ -75,13 +74,6 @@ namespace NegativeEddy.LemonadeStand
 
         private void L135_Initialize()
         {
-            // 135  DIM A(30),L(30),H(30),B(30),S(30),P(30),G(30)
-            // 150 P9 = 10
-            // 160 S3 = .15
-            // 170 S2 = 30
-            // 175 A2 = 2.00
-            // 194	C9 = .5
-            // 195	C2 = 1
             Stands = new Stand[30];
 
             Day = 0;
@@ -92,25 +84,12 @@ namespace NegativeEddy.LemonadeStand
             C9 = 0.5;
             C2 = 1;
 
-            // 300  REM   START OF GAME
-            // 310  GOSUB 12000
             Sub12000_TitlePage();
-            // : FOR I = 1 TO N:B(I) = 0:A(I) = A2: NEXT
             for (I = 0; I < N_NumberOfPlayers; I++)
             {
                 Stands[I] = new Stand(InitialAssets);
             }
-            // 320  IF A$ = "Y" THEN  GOSUB 13000: GOTO 400
-            // 330  GOSUB 14000
-            if (AS == "Y")
-            {
-                Sub13000_NewBusiness();
-            }
-            else
-            {
-                Sub14000_ContinueOldGame();
-            }
-
+            Sub13000_NewBusiness();
         }
 
         private int J_ChanceOfRain;
@@ -735,6 +714,7 @@ namespace NegativeEddy.LemonadeStand
             Print("AFFECT YOUR BUSINESS IN ANY WAY). IF YOU");
             Print("MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
 
+            string AS;
             do
             {
                 Print();
@@ -821,45 +801,6 @@ namespace NegativeEddy.LemonadeStand
             // 13300  GOSUB 18000
             Sub18000_SpaceToContinue();
             // 13302  HOME : RETURN
-        }
-
-        private void Sub14000_ContinueOldGame()
-        {
-            throw new NotImplementedException();
-            // 14000  REM   CONTINUE OLD GAME
-            // 14100  CALL  - 936: PRINT  CHR$ (7);:I = 0
-            I = 0;
-            // 14110  PRINT "HI AGAIN!  WELCOME BACK TO LEMONSVILLE! ": PRINT
-            // 14120  PRINT "LET'S CONTINUE YOUR LAST GAME FROM WHERE"
-            // 14130  PRINT "YOU LEFT IT LAST TIME.  DO YOU REMEMBER "
-            // 14140  PRINT "WHAT DAY NUMBER IT WAS? ";
-            Print("HI AGAIN!  WELCOME BACK TO LEMONSVILLE! ");
-            Print();
-            Print("LET'S CONTINUE YOUR LAST GAME FROM WHERE");
-            Print("YOU LEFT IT LAST TIME.  DO YOU REMEMBER ");
-            Print("WHAT DAY NUMBER IT WAS? ");
-
-            // 14150  INPUT "";A$:A =  VAL (A$)
-            // : PRINT 
-            // : IF A <  > 0 THEN 14200
-            {
-                // 14160 A$ =  LEFT$ (A$,1): IF A$ = "Y" THEN  PRINT "GOOD!  WHAT DAY WAS IT? ";:I = I + 1: GOTO 14150
-                // 14170  IF A$ = "N" OR I > 0 THEN 14300
-                // 14180  PRINT  CHR$ (7);"YES OR NO? ";:I = I + 1: GOTO 14150
-            }
-            // 14200  IF A < 1 OR A > 99 OR A <  >  INT (A) THEN 14300
-            // 14210 D = A
-            // 14300  PRINT "OKAY - WE'LL START WITH DAY NO. ";D + 1: PRINT
-            // 14400  FOR I = 1 TO N: PRINT : PRINT
-            // 14410  PRINT "PLAYER NO. ";I;", HOW MUCH MONEY (ASSETS)": PRINT
-            // 14420  PRINT "DID YOU HAVE? ";
-            // 14430  INPUT "";A$:A =  VAL (A$): PRINT
-            // 14440  IF A < 2 THEN  PRINT "O.K. - WE'LL START YOU OUT WITH $2.00":A = 2: GOTO 14490
-            // 14450  IF A > 40 THEN  PRINT "JUST TO BE FAIR, LET'S MAKE THAT $10.00":A = 10
-            // 14490 A(I) =  INT (A * 100 + .5) / 100: NEXT
-            // 14500  PRINT : PRINT  CHR$ (7): INPUT "...READY TO BEGIN? ";A$
-            // 14510  IF  LEFT$ (A$,1) = "N" THEN 13000
-            // 14520  RETURN
         }
 
         private void Sub15000_WeatherDisplay()
