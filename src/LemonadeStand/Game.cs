@@ -56,11 +56,6 @@ namespace NegativeEddy.LemonadeStand
         public decimal CostPerSignDollars { get; set; } = 0.15M;
 
         /// <summary>
-        /// Initial cash assets in dollars
-        /// </summary>
-        public decimal InitialAssets { get; private set; } = 2.00M;
-
-        /// <summary>
         /// cost to make a glass of lemonade, in dollars
         /// </summary>
         public decimal CostPerGlassDollars { get; private set; }
@@ -69,16 +64,14 @@ namespace NegativeEddy.LemonadeStand
 
         public void Init(decimal intialAssets = 2.0M)
         {
-            InitialAssets = intialAssets;
-
             TitlePage();
             int numPlayers = GetPlayerCount();
             Stands = new Stand[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
-                Stands[i] = new Stand(i + 1, InitialAssets);
+                Stands[i] = new Stand(i + 1, intialAssets);
             }
-            PrintIntro();
+            PrintIntro(intialAssets);
         }
 
 
@@ -428,7 +421,7 @@ namespace NegativeEddy.LemonadeStand
             return playerCount;
         }
 
-        private void PrintIntro()
+        private void PrintIntro(decimal initialAssets)
         {
             Print("TO MANAGE YOUR LEMONADE STAND, YOU WILL NEED TO MAKE THESE DECISIONS EVERY DAY: ");
             Print();
@@ -436,7 +429,7 @@ namespace NegativeEddy.LemonadeStand
             Print("2. HOW MANY ADVERTISING SIGNS TO MAKE (THE SIGNS COST FIFTEEN CENTS EACH)  ");
             Print("3. WHAT PRICE TO CHARGE FOR EACH GLASS  ");
             Print();
-            Print($"YOU WILL BEGIN WITH {InitialAssets:C2} CASH (ASSETS). BECAUSE YOUR MOTHER GAVE YOU SOME SUGAR, YOUR COST TO MAKE LEMONADE IS TWO CENTS A GLASS (THIS MAY CHANGE IN THE FUTURE).");
+            Print($"YOU WILL BEGIN WITH {initialAssets:C2} CASH (ASSETS). BECAUSE YOUR MOTHER GAVE YOU SOME SUGAR, YOUR COST TO MAKE LEMONADE IS TWO CENTS A GLASS (THIS MAY CHANGE IN THE FUTURE).");
             Print();
 
             Print("YOUR EXPENSES ARE THE SUM OF THE COST OF THE LEMONADE AND THE COST OF THE SIGNS.");
