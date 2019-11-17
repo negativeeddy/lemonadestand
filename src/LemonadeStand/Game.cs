@@ -121,7 +121,7 @@ namespace NegativeEddy.LemonadeStand
 
             if (skyChance < 6)
             {
-                Sky = SkyOutlook.Clear;
+                Sky = SkyOutlook.Sunny;
             }
             else if (skyChance < 8)
             {
@@ -129,12 +129,12 @@ namespace NegativeEddy.LemonadeStand
             }
             else
             {
-                Sky = SkyOutlook.Hot;
+                Sky = SkyOutlook.HotAndDry;
             }
 
             if (Day < 3)
             {
-                Sky = SkyOutlook.Hot;
+                Sky = SkyOutlook.HotAndDry;
             }
 
             UpdateCostPerGlass();
@@ -371,7 +371,7 @@ namespace NegativeEddy.LemonadeStand
         {
             switch (Sky)
             {
-                case SkyOutlook.Hot:
+                case SkyOutlook.HotAndDry:
                     Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
                     WeatherFactor = 2;
                     break;

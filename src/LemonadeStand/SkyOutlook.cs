@@ -1,10 +1,14 @@
 ﻿namespace NegativeEddy.LemonadeStand
 {
+    /// <summary>
+    /// sky color 
+    /// originally SC : (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy)  
+    /// </summary>
     public enum SkyOutlook
     {
-        Clear = 2,
-        Hot = 7,
-        Cloudy = 10,
-        Thunderstorms = 5,
+        Sunny,
+        Thunderstorms,
+        HotAndDry,
+        Cloudy,
     }
 }
