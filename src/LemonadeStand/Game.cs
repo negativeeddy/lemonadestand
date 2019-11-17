@@ -38,7 +38,7 @@ namespace NegativeEddy.LemonadeStand
         // 0>WeatherFactor<1 for poor weather;   
         // also adjusts traffic for things like street crews working 
         private double WeatherFactor;
-        private int R2; // R2: set to 2 half the time when street department is working;   indicates that street crew bought all lemonade at lunch 
+        private bool StreetCrewBuysAll; // R2: set to 2 half the time when street department is working;   indicates that street crew bought all lemonade at lunch 
         private decimal CostPerSignDollars; // S3: cost per advertising sign, in dollars 
         private int S2; // number of players?
         private decimal InitialAssets; // initial cash?
@@ -232,9 +232,9 @@ namespace NegativeEddy.LemonadeStand
                 Print("$$ LEMONSVILLE DAILY FINANCIAL REPORT $$");
                 Print();
 
-                if (R2 == 2)
+                if (StreetCrewBuysAll)
                 {
-                    Sub2290_StreetCrewsBoughtEverything_Then1185();
+                    Print_StreetCrewsBoughtEverything();
                 }
             }
 
@@ -249,7 +249,7 @@ namespace NegativeEddy.LemonadeStand
 
                 int GlassesSold;
 
-                if (R2 != 2)
+                if (!StreetCrewBuysAll)
                 {
                     if (stand.PricePerGlassCents < MaxPricePerGlassCents)
                     {
@@ -320,7 +320,7 @@ namespace NegativeEddy.LemonadeStand
                 }
             }
             WeatherFactor = 1;
-            R2 = 0;
+            StreetCrewBuysAll = false;
         }
 
         private void Sub2000_RandomEvents()
@@ -354,13 +354,13 @@ namespace NegativeEddy.LemonadeStand
             }
             else
             {
-                R2 = 2;
+                StreetCrewBuysAll = true;
             }
 
             return;
         }
 
-        private void Sub2290_StreetCrewsBoughtEverything_Then1185()
+        private void Print_StreetCrewsBoughtEverything()
         {
             Print("THE STREET CREWS BOUGHT ALL YOUR");
             Print("LEMONADE AT LUNCHTIME!!");
