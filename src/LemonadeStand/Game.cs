@@ -8,10 +8,10 @@ namespace NegativeEddy.LemonadeStand
         private readonly IGameIO _io;
         private readonly IRandom _random;
 
-        public Game(IGameIO io, IRandom random)
+        public Game(IGameIO io, IRandom? random = null)
         {
             _io = io;
-            _random = random;
+            _random = random ?? new NetStandardRandom();
         }
 
         public bool AddNewLinesToOutput { get; set; } = true;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NegativeEddy.LemonadeStand.Console
+namespace NegativeEddy.LemonadeStand
 {
     public class NetStandardRandom : IRandom
     {
