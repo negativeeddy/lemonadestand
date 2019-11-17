@@ -80,13 +80,6 @@ namespace NegativeEddy.LemonadeStand
         public decimal CostPerGlassDollars { get; private set; }
 
         /// <summary>
-        /// if everything is ruined by thunderstorm
-        /// originally G(i) : 0 = ruined, 1 = not ruined
-        /// </summary>
-        private bool RuinedByThunderstorm { get; set; }
-
-
-        /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
         /// TODO: make this an enum?
         /// originally SC: 
@@ -116,6 +109,7 @@ namespace NegativeEddy.LemonadeStand
             }
 
             Day++;
+            bool ruinedByThunderstorm = false;
 
             int skyChance = _random.Next(10);
 
@@ -145,7 +139,6 @@ namespace NegativeEddy.LemonadeStand
                 RandomEvents();
             }
 
-            RuinedByThunderstorm = false;
 
             foreach (Stand stand in Stands)
             {
@@ -175,7 +168,7 @@ namespace NegativeEddy.LemonadeStand
             {
                 // thunderstorm happened
                 Sky = SkyOutlook.Thunderstorms;
-                RuinedByThunderstorm = true;
+                ruinedByThunderstorm = true;
                 Print("WEATHER REPORT:  A SEVERE THUNDERSTORM HIT LEMONSVILLE EARLIER TODAY, JUST AS THE LEMONADE STANDS WERE BEING SET UP. UNFORTUNATELY, EVERYTHING WAS RUINED!!");
             }
             else
@@ -197,7 +190,7 @@ namespace NegativeEddy.LemonadeStand
                     stand.Assets = 0;
                 }
 
-                int GlassesSold = CalculateGlassesSold(stand);
+                int GlassesSold = CalculateGlassesSold(stand, StreetCrewBuysEverything, ruinedByThunderstorm);
 
                 decimal income = GlassesSold * stand.PricePerGlassCents * .01M;
                 decimal expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
@@ -238,14 +231,14 @@ namespace NegativeEddy.LemonadeStand
             return true;
         }
 
-        private int CalculateGlassesSold(Stand stand)
+        private int CalculateGlassesSold(Stand stand, bool streetCrewBuysEverything, bool ruinedByThunderstorm)
         {
             int GlassesSold;
-            if (StreetCrewBuysEverything)
+            if (streetCrewBuysEverything)
             {
                 GlassesSold = stand.GlassesMade;
             }
-            else if (RuinedByThunderstorm)
+            else if (ruinedByThunderstorm)
             {
                 return 0;
             }
