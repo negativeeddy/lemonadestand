@@ -95,7 +95,7 @@ namespace NegativeEddy.LemonadeStand
             Stands = new Stand[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
-                Stands[i] = new Stand(InitialAssets);
+                Stands[i] = new Stand(i+1, InitialAssets);
             }
             NewBusiness();
         }
@@ -159,13 +159,11 @@ namespace NegativeEddy.LemonadeStand
                 RandomEvents();
             }
 
-            int i = 0;
             foreach (Stand stand in Stands)
             {
-                i++;
                 stand.RuinedByThunderstorm = false;
                 stand.H = 0;
-                Print($"LEMONADE STAND {i} ASSETS {stand.Assets:C2}");
+                Print($"LEMONADE STAND {stand.Id} ASSETS {stand.Assets:C2}");
                 Print();
                 if (stand.IsBankrupt)
                 {
@@ -255,10 +253,8 @@ namespace NegativeEddy.LemonadeStand
                 }
             }
 
-            i = 0;
             foreach (Stand stand in Stands)
             {
-                i++;
                 if (stand.Assets < 0)
                 {
                     stand.Assets = 0;
@@ -307,7 +303,7 @@ namespace NegativeEddy.LemonadeStand
                 Print();
                 if (stand.IsBankrupt)
                 {
-                    Print($"STAND {i}");
+                    Print($"STAND {stand.Id}");
                     Print("  BANKRUPT");
                     SpaceToContinue();
                 }
@@ -317,7 +313,6 @@ namespace NegativeEddy.LemonadeStand
                     {
                         Day = Day,
                         Stand = stand,
-                        StandNumber = i,
                         Income = Income,
                         Expenses = Expenses,
                         Profit = Profit,
@@ -328,7 +323,7 @@ namespace NegativeEddy.LemonadeStand
 
                     if (stand.Assets <= CostPerGlassDollars)
                     {
-                        Print($"STAND {i}");
+                        Print($"STAND {stand.Id}");
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
                         stand.IsBankrupt = true;
@@ -411,7 +406,6 @@ namespace NegativeEddy.LemonadeStand
         {
             public int Day;
             public Stand Stand;
-            public int StandNumber;
             public decimal Income;
             public decimal Profit;
             public decimal Expenses;
@@ -420,7 +414,7 @@ namespace NegativeEddy.LemonadeStand
 
         private void PrintDailyReport(DailyResult result)
         {
-            Print($"   DAY {result.Day} STAND {result.StandNumber}");
+            Print($"   DAY {result.Day} STAND {result.Stand.Id}");
             Print();
             Print();
 

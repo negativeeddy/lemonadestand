@@ -4,10 +4,16 @@
     {
         public class Stand
         {
-            public Stand(decimal assets)
+            public Stand(int id, decimal assets)
             {
+                Id = id;
                 Assets = assets;
             }
+
+            /// <summary>
+            /// The Id of the stand
+            /// </summary>
+            public int Id { get; set; }
 
             /// <summary>
             /// Assets (cash on hand, in dollars)
