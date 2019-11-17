@@ -48,11 +48,6 @@
             /// originally S(i)
             /// </summary>
             public int SignsMade { get; set; }
-
-            /// <summary>
-            /// // H(i): apparently intended to relate to storms, but never assigned a value 
-            /// </summary>
-            public decimal H { get; set; } // TODO: probably delete this
         }
     }
 }

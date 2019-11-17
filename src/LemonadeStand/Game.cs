@@ -62,7 +62,7 @@ namespace NegativeEddy.LemonadeStand
         /// indicates that street crew bought all lemonade at lunch 
         /// this happens half the time when street department is working   
         /// </summary>
-        private bool StreetCrewBuysAll;
+        private bool StreetCrewBuysEverything;
 
         /// <summary>
         /// cost per advertising sign, in dollars 
@@ -97,7 +97,7 @@ namespace NegativeEddy.LemonadeStand
             {
                 Stands[i] = new Stand(i+1, InitialAssets);
             }
-            NewBusiness();
+            PrintIntro();
         }
 
 
@@ -107,6 +107,8 @@ namespace NegativeEddy.LemonadeStand
             {
                 throw new InvalidOperationException("Game not initialized");
             }
+
+            Day++;
 
             SkyColor = _random.Next(10);
             if (SkyColor < 6)
@@ -127,33 +129,9 @@ namespace NegativeEddy.LemonadeStand
                 SkyColor = 2;
             }
 
-            Day++;
-            Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
-            if (Day < 3)
-            {
-                CostPerGlassDollars = 0.02M;
-            }
-            else if (Day < 7)
-            {
-                CostPerGlassDollars = 0.04M;
-            }
-            else
-            {
-                CostPerGlassDollars = 0.05M;
-            }
-            Print($"{CostPerGlassDollars:C2}");
-            Print();
+            UpdateCostPerGlass();
+
             WeatherFactor = 1;
-
-            if (Day == 3)
-            {
-                Print("(YOUR MOTHER QUIT GIVING YOU FREE SUGAR)");
-            }
-            else if (Day == 7)
-            {
-                Print("(THE PRICE OF LEMONADE MIX JUST WENT UP)");
-            }
-
             if (Day > 2)
             {
                 RandomEvents();
@@ -162,7 +140,6 @@ namespace NegativeEddy.LemonadeStand
             foreach (Stand stand in Stands)
             {
                 stand.RuinedByThunderstorm = false;
-                stand.H = 0;
                 Print($"LEMONADE STAND {stand.Id} ASSETS {stand.Assets:C2}");
                 Print();
                 if (stand.IsBankrupt)
@@ -240,14 +217,20 @@ namespace NegativeEddy.LemonadeStand
             Print();
             if (SkyColor == 10 && _random.Next(100) < 25)
             {
-                Thunderstorm();
+                // thunderstorm happened
+                SkyColor = 5;
+                foreach (Stand stand in Stands)
+                {
+                    stand.RuinedByThunderstorm = true;
+                }
+                PrintThunderstorm();
             }
             else
             {
                 Print("$$ LEMONSVILLE DAILY FINANCIAL REPORT $$");
                 Print();
 
-                if (StreetCrewBuysAll)
+                if (StreetCrewBuysEverything)
                 {
                     Print_StreetCrewsBoughtEverything();
                 }
@@ -262,7 +245,7 @@ namespace NegativeEddy.LemonadeStand
 
                 int GlassesSold;
 
-                if (!StreetCrewBuysAll)
+                if (!StreetCrewBuysEverything)
                 {
                     const int MaxPricePerGlassCents = 10;
                     const decimal S2 = 30;
@@ -293,13 +276,8 @@ namespace NegativeEddy.LemonadeStand
                 decimal Income = GlassesSold * stand.PricePerGlassCents * .01M;
                 decimal Expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
                 decimal Profit = Income - Expenses;
-                stand.Assets = stand.Assets + Profit;
+                stand.Assets += Profit;
 
-                if (stand.H == 1)
-                {
-                    Thunderstorm();
-                    continue;   // to 1185
-                }
                 Print();
                 if (stand.IsBankrupt)
                 {
@@ -337,9 +315,37 @@ namespace NegativeEddy.LemonadeStand
             }
 
             WeatherFactor = 1;
-            StreetCrewBuysAll = false;
+            StreetCrewBuysEverything = false;
 
             return true;
+        }
+
+        private void UpdateCostPerGlass()
+        {
+            Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
+            if (Day < 3)
+            {
+                CostPerGlassDollars = 0.02M;
+            }
+            else if (Day < 7)
+            {
+                CostPerGlassDollars = 0.04M;
+            }
+            else
+            {
+                CostPerGlassDollars = 0.05M;
+            }
+            Print($"{CostPerGlassDollars:C2}");
+            Print();
+
+            if (Day == 3)
+            {
+                Print("(YOUR MOTHER QUIT GIVING YOU FREE SUGAR)");
+            }
+            else if (Day == 7)
+            {
+                Print("(THE PRICE OF LEMONADE MIX JUST WENT UP)");
+            }
         }
 
         private void RandomEvents()
@@ -370,7 +376,7 @@ namespace NegativeEddy.LemonadeStand
                         else
                         {
                             // 50% of the time the street crew buys all the lemonade
-                            StreetCrewBuysAll = true;
+                            StreetCrewBuysEverything = true;
                         }
                     }
                     break;
@@ -383,18 +389,12 @@ namespace NegativeEddy.LemonadeStand
             Print("LEMONADE AT LUNCHTIME!!");
         }
 
-        private void Thunderstorm()
+        private void PrintThunderstorm()
         {
-            SkyColor = 5;
             Print("WEATHER REPORT:  A SEVERE THUNDERSTORM");
             Print("HIT LEMONSVILLE EARLIER TODAY, JUST AS");
             Print("THE LEMONADE STANDS WERE BEING SET UP.");
             Print("UNFORTUNATELY, EVERYTHING WAS RUINED!!");
-
-            foreach (Stand stand in Stands)
-            {
-                stand.RuinedByThunderstorm = true;
-            }
         }
 
         private void PrintHeatWave()
@@ -469,7 +469,7 @@ namespace NegativeEddy.LemonadeStand
             return playerCount;
         }
 
-        private void NewBusiness()
+        private void PrintIntro()
         {
             Print("TO MANAGE YOUR LEMONADE STAND, YOU WILL ");
             Print("NEED TO MAKE THESE DECISIONS EVERY DAY: ");

@@ -27,8 +27,10 @@ namespace NegativeEddy.LemonadeStand.Tests
             };
 
 
-            var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
-            stand.AddNewLinesToOutput = false;
+            var stand = new Game(new TestIO(story, _output), new ConstantRandom(0))
+            {
+                AddNewLinesToOutput = false
+            };
             stand.Init();
             _output.WriteLine("***************************************************************");
             stand.Step();
@@ -67,8 +69,10 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "",
             };
 
-            var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
-            stand.AddNewLinesToOutput = false;
+            var stand = new Game(new TestIO(story, _output), new ConstantRandom(0))
+            {
+                AddNewLinesToOutput = false
+            };
             stand.Init();
             stand.Step();
             Assert.Equal(1.85M, stand.Stands[0].Assets);
@@ -113,8 +117,10 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "",  // profit = -0.20
             };
 
-            var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
-            stand.AddNewLinesToOutput = false;
+            var stand = new Game(new TestIO(story, _output), new ConstantRandom(0))
+            {
+                AddNewLinesToOutput = false
+            };
 
             stand.Init();
             stand.Step();   // player 1
@@ -131,7 +137,7 @@ namespace NegativeEddy.LemonadeStand.Tests
 
     public class TestIO : IGameIO
     {
-        ITestOutputHelper _output;
+        private readonly ITestOutputHelper _output;
         public string[] Story { get; }
 
         public TestIO(string[] story, ITestOutputHelper output)
