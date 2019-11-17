@@ -179,9 +179,9 @@ namespace NegativeEddy.LemonadeStand
                     stand.Assets = 0;
                 }
 
-                int GlassesSold = CalculateGlassesSold(stand, weatherFactor, streetCrewBuysEverything, ruinedByThunderstorm);
+                int glassesSold = CalculateGlassesSold(stand, weatherFactor, streetCrewBuysEverything, ruinedByThunderstorm);
 
-                decimal income = GlassesSold * stand.PricePerGlassCents * .01M;
+                decimal income = glassesSold * stand.PricePerGlassCents * .01M;
                 decimal expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
                 decimal profit = income - expenses;
                 stand.Assets += profit;
@@ -199,7 +199,7 @@ namespace NegativeEddy.LemonadeStand
                         Income = income,
                         Expenses = expenses,
                         Profit = profit,
-                        GlassesSold = GlassesSold,
+                        GlassesSold = glassesSold,
                     });
 
                     if (stand.Assets <= CostPerGlassDollars)
@@ -220,10 +220,10 @@ namespace NegativeEddy.LemonadeStand
 
         private int CalculateGlassesSold(Stand stand, double weatherFactor, bool streetCrewBuysEverything, bool ruinedByThunderstorm)
         {
-            int GlassesSold;
+            int glassesSold;
             if (streetCrewBuysEverything)
             {
-                GlassesSold = stand.GlassesMade;
+                glassesSold = stand.GlassesMade;
             }
             else if (ruinedByThunderstorm)
             {
@@ -246,16 +246,16 @@ namespace NegativeEddy.LemonadeStand
                 double W = -stand.SignsMade * 0.5;
                 double V = 1 - Math.Exp(W);
                 double tmp = weatherFactor * ((double)N1 + (double)N1 * V);
-                GlassesSold = (int)tmp;
+                glassesSold = (int)tmp;
 
-                if (GlassesSold > stand.GlassesMade)
+                if (glassesSold > stand.GlassesMade)
                 {
                     // can't sell more glasses than we made
-                    GlassesSold = stand.GlassesMade;
+                    glassesSold = stand.GlassesMade;
                 }
             }
 
-            return GlassesSold;
+            return glassesSold;
         }
 
         private void QueryPriceToSellGlasses(Stand stand)
