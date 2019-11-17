@@ -67,17 +67,17 @@ namespace NegativeEddy.LemonadeStand
         /// <summary>
         /// cost per advertising sign, in dollars 
         /// </summary>
-        private decimal CostPerSignDollars = 0.15M;
+        public decimal CostPerSignDollars { get; set; } = 0.15M;
 
         /// <summary>
         /// Initial cash assets in dollars
         /// </summary>
-        private decimal InitialAssets = 2.00M;
+        public decimal InitialAssets { get; private set; } = 2.00M;
 
         /// <summary>
         /// cost to make a glass of lemonade, in dollars
         /// </summary>
-        private decimal CostPerGlassDollars;
+        public decimal CostPerGlassDollars { get; private set; }
 
         /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
@@ -86,8 +86,10 @@ namespace NegativeEddy.LemonadeStand
         /// </summary>
         private int SkyColor;
 
-        public void Init()
+        public void Init(decimal intialAssets = 2.0M)
         {
+            InitialAssets = intialAssets;
+
             TitlePage();
             int numPlayers = GetPlayerCount();
             Stands = new Stand[numPlayers];
