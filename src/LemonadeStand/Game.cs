@@ -42,7 +42,7 @@ namespace NegativeEddy.LemonadeStand
         private decimal CostPerSignDollars; // S3: cost per advertising sign, in dollars 
         private int S2; // number of players?
         private decimal InitialAssets; // initial cash?
-        private double C9;
+
         private decimal CostPerGlassDollars;
         private int C2;
 
@@ -67,7 +67,6 @@ namespace NegativeEddy.LemonadeStand
             CostPerSignDollars = .15M;
             S2 = 30;
             InitialAssets = 2.00M;
-            C9 = 0.5;
             C2 = 1;
 
             TitlePage();
@@ -260,7 +259,7 @@ namespace NegativeEddy.LemonadeStand
                     {
                         N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (stand.PricePerGlassCents * stand.PricePerGlassCents);
                     }
-                    double W = -stand.SignsMade * C9;
+                    double W = -stand.SignsMade * 0.5;
                     double V = 1 - Math.Exp(W) * C2;
                     double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
                     GlassesSold = stand.RuinedByThunderstorm ? 0 : (int)tmp;
