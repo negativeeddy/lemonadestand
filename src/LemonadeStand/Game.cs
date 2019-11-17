@@ -77,12 +77,12 @@ namespace NegativeEddy.LemonadeStand
         /// <summary>
         /// cost per advertising sign, in dollars 
         /// </summary>
-        private decimal CostPerSignDollars = 0.15M; 
-        
+        private decimal CostPerSignDollars = 0.15M;
+
         /// <summary>
         /// Initial cash assets in dollars
         /// </summary>
-        private decimal InitialAssets = 2.00M; 
+        private decimal InitialAssets = 2.00M;
 
         /// <summary>
         /// cost to make a glass of lemonade, in dollars
@@ -357,40 +357,37 @@ namespace NegativeEddy.LemonadeStand
 
         private void RandomEvents()
         {
-            if (SkyColor == 7)
+            switch (SkyColor)
             {
-                PrintHeatWave();
-                WeatherFactor = 2;
-                return;
-            }
+                case 7:
+                    PrintHeatWave();
+                    WeatherFactor = 2;
+                    break;
+                case 10:
+                    if (_random.Next(100) > 25)
+                    {
+                        int chanceOfRain = 30 + _random.Next(5) * 10;
+                        Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN,");
+                        Print("AND THE WEATHER IS COOLER TODAY.");
+                        WeatherFactor = 1 - chanceOfRain / 100.0d;
+                    }
+                    else
+                    {
+                        Print("THE STREET DEPARTMENT IS WORKING TODAY.");
+                        Print("THERE WILL BE NO TRAFFIC ON YOUR STREET.");
 
-            if (SkyColor != 10)
-            {
-                return;
+                        if (_random.Next(100) < 50)
+                        {
+                            WeatherFactor = 0.1;
+                        }
+                        else
+                        {
+                            // 50% of the time the street crew buys all the lemonade
+                            StreetCrewBuysAll = true;
+                        }
+                    }
+                    break;
             }
-
-            if (_random.Next(100) > 25)
-            {
-                int chanceOfRain = 30 + _random.Next(5) * 10;
-                Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN,");
-                Print("AND THE WEATHER IS COOLER TODAY.");
-                WeatherFactor = 1 - chanceOfRain / 100.0d;
-                return;
-            }
-
-            Print("THE STREET DEPARTMENT IS WORKING TODAY.");
-            Print("THERE WILL BE NO TRAFFIC ON YOUR STREET.");
-
-            if (_random.Next(100) < 50)
-            {
-                WeatherFactor = 0.1;
-            }
-            else
-            {
-                StreetCrewBuysAll = true;
-            }
-
-            return;
         }
 
         private void Print_StreetCrewsBoughtEverything()
@@ -480,7 +477,7 @@ namespace NegativeEddy.LemonadeStand
             {
                 Print("HOW MANY PEOPLE WILL BE PLAYING?");
                 string NS = _io.GetInput();
-                int.TryParse (NS, out playerCount);
+                int.TryParse(NS, out playerCount);
             }
 
             return playerCount;
