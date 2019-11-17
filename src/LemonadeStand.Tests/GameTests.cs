@@ -85,11 +85,12 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "10", // 10 glasses   = .20
                 "3", // 3 signs       = .45
                 "5", // 5 cents/glass = .50
+
                 "5", // 5 glasses     = .10
                 "1", // 1 signs       = .15
-                "3", // 5 cents/glass = .25
-                "",  // profit = -0.00
-                "",  // profit = -0.00
+                "3", // 3 cents/glass = .15
+                "",  // profit = -0.15
+                "",  // profit = -0.10
 
                 "10", // 10 glasses
                 "3", // 3 signs
@@ -100,27 +101,27 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "",
                 "",  // profit = -0.00
 
-                "10", // 10 glasses
-                "3", // 3 signs
-                "5", // 5 cents/glass
-                "5", // 10 glasses
-                "1", // 3 signs
-                "3", // 5 cents/glass
-                "",
-                       "",  // profit = -0.00
- };
+                "10", // 10 glasses   = .40
+                "3", // 3 signs       = .45
+                "5", // 5 cents/glass = .50
+                "5", // 5 glasses     = .20
+                "1", // 1 signs       = .15
+                "3", // 3 cents/glass = .15
+                "",  // profit = -0.45
+                "",  // profit = -0.20
+            };
 
             var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
             stand.Init();
             stand.Step();   // player 1
             Assert.Equal(1.85M, stand.Stands[0].Assets);
-            Assert.Equal(2.00M, stand.Stands[1].Assets);
+            Assert.Equal(1.90M, stand.Stands[1].Assets);
             stand.Step();   // player 1
             Assert.Equal(1.70M, stand.Stands[0].Assets);
-            Assert.Equal(2.00M, stand.Stands[1].Assets);
+            Assert.Equal(1.80M, stand.Stands[1].Assets);
             stand.Step();   // player 1
             Assert.Equal(1.35M, stand.Stands[0].Assets);
-            Assert.Equal(2.00M, stand.Stands[1].Assets);
+            Assert.Equal(1.60M, stand.Stands[1].Assets);
         }
     }
 
