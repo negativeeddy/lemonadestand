@@ -46,8 +46,6 @@ namespace NegativeEddy.LemonadeStand
         private decimal CostPerGlassDollars;
         private int C2;
 
-        private decimal N1;
-
         /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy).  // TODO: make this an enum?
         /// originally SC: 
@@ -251,6 +249,8 @@ namespace NegativeEddy.LemonadeStand
 
                 if (!StreetCrewBuysAll)
                 {
+                    decimal N1;
+
                     if (stand.PricePerGlassCents < MaxPricePerGlassCents)
                     {
                         N1 = (MaxPricePerGlassCents - stand.PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
