@@ -4,7 +4,7 @@ namespace NegativeEddy.LemonadeStand
 {
     public class NetStandardRandom : IRandom
     {
-        Random rand = new Random();
+        private readonly Random rand = new Random();
 
         public int Next(int maxExclusive)
         {

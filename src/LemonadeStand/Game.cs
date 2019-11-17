@@ -80,6 +80,13 @@ namespace NegativeEddy.LemonadeStand
         public decimal CostPerGlassDollars { get; private set; }
 
         /// <summary>
+        /// if everything is ruined by thunderstorm
+        /// originally G(i) : 0 = ruined, 1 = not ruined
+        /// </summary>
+        private bool RuinedByThunderstorm { get; set; }
+
+
+        /// <summary>
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
         /// TODO: make this an enum?
         /// originally SC: 
@@ -95,7 +102,7 @@ namespace NegativeEddy.LemonadeStand
             Stands = new Stand[numPlayers];
             for (int i = 0; i < numPlayers; i++)
             {
-                Stands[i] = new Stand(i+1, InitialAssets);
+                Stands[i] = new Stand(i + 1, InitialAssets);
             }
             PrintIntro();
         }
@@ -137,9 +144,10 @@ namespace NegativeEddy.LemonadeStand
                 RandomEvents();
             }
 
+            RuinedByThunderstorm = false;
+
             foreach (Stand stand in Stands)
             {
-                stand.RuinedByThunderstorm = false;
                 Print($"LEMONADE STAND {stand.Id} ASSETS {stand.Assets:C2}");
                 Print();
                 if (stand.IsBankrupt)
@@ -147,74 +155,26 @@ namespace NegativeEddy.LemonadeStand
                     Print("YOU ARE BANKRUPT, NO DECISIONS FOR YOU TO MAKE.");
                     if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassDollars)
                     {
-                        Exit();
+                        return false;
                     }
                 }
                 else
                 {
-                    while (true)
-                    {
-                        Print("HOW MANY GLASSES OF LEMONADE DO YOU WISH TO MAKE ");
-                        stand.GlassesMade = int.Parse(_io.GetInput());
-                        if (stand.GlassesMade < 0 || stand.GlassesMade > 1000)
-                        {
-                            Print("COME ON, LET'S BE REASONABLE NOW!!!\nTRY AGAIN");
-                            continue;
-                        }
+                    QueryNumberOfGlassesToMake(stand);
 
-                        if (stand.GlassesMade * CostPerGlassDollars <= stand.Assets)
-                        {
-                            // user can purchase that amount of lemonade
-                            break;
-                        }
-                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {stand.Assets:C2} IN CASH AND TO MAKE {stand.GlassesMade} GLASSES OF LEMONADE YOU NEED ${stand.GlassesMade * CostPerGlassDollars:C2} IN CASH.");
-                    }
+                    QueryNumberOfSignsToMake(stand);
 
-                    while (true)
-                    {
-                        Print();
-                        Print($"HOW MANY ADVERTISING SIGNS ({CostPerSignDollars * 100} CENTS EACH) DO YOU WANT TO MAKE ");
-                        stand.SignsMade = int.Parse(_io.GetInput());
-                        if (stand.SignsMade < 0 || stand.SignsMade > 50)
-                        {
-                            Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
-                            continue;
-                        }
-
-                        if (stand.SignsMade * CostPerSignDollars <= stand.Assets - stand.GlassesMade * CostPerGlassDollars)
-                        {
-                            break;
-                        }
-
-                        Print();
-                        decimal tmp = stand.Assets - stand.GlassesMade * CostPerGlassDollars;
-                        Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2} IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
-                    }
-
-                    while (true)
-                    {
-                        Print();
-                        Print("WHAT PRICE (IN CENTS) DO YOU WISH TO CHARGE FOR LEMONADE ");
-                        stand.PricePerGlassCents = int.Parse(_io.GetInput());
-                        if (stand.PricePerGlassCents <= 0 || stand.PricePerGlassCents >= 100)
-                        {
-                            Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
-                            continue;
-                        }
-                        break;
-                    }
+                    QueryPriceToSellGlasses(stand);
                 }
             }
 
             Print();
+
             if (SkyColor == 10 && _random.Next(100) < 25)
             {
                 // thunderstorm happened
                 SkyColor = 5;
-                foreach (Stand stand in Stands)
-                {
-                    stand.RuinedByThunderstorm = true;
-                }
+                RuinedByThunderstorm = true;
                 Print("WEATHER REPORT:  A SEVERE THUNDERSTORM HIT LEMONSVILLE EARLIER TODAY, JUST AS THE LEMONADE STANDS WERE BEING SET UP. UNFORTUNATELY, EVERYTHING WAS RUINED!!");
             }
             else
@@ -236,35 +196,7 @@ namespace NegativeEddy.LemonadeStand
                     stand.Assets = 0;
                 }
 
-                int GlassesSold;
-
-                if (!StreetCrewBuysEverything)
-                {
-                    const int MaxPricePerGlassCents = 10;
-                    const decimal S2 = 30;
-                    decimal N1;
-
-                    if (stand.PricePerGlassCents < MaxPricePerGlassCents)
-                    {
-                        N1 = (MaxPricePerGlassCents - stand.PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
-                    }
-                    else
-                    {
-                        N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (stand.PricePerGlassCents * stand.PricePerGlassCents);
-                    }
-                    double W = -stand.SignsMade * 0.5;
-                    double V = 1 - Math.Exp(W);
-                    double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
-                    GlassesSold = stand.RuinedByThunderstorm ? 0 : (int)tmp;
-                    if (GlassesSold > stand.GlassesMade)
-                    {
-                        GlassesSold = stand.GlassesMade;
-                    }
-                }
-                else
-                {
-                    GlassesSold = stand.GlassesMade;
-                }
+                int GlassesSold = CalculateGlassesSold(stand);
 
                 decimal income = GlassesSold * stand.PricePerGlassCents * .01M;
                 decimal expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
@@ -293,7 +225,7 @@ namespace NegativeEddy.LemonadeStand
                         stand.IsBankrupt = true;
                         if (Stands.Length == 1 && Stands[0].IsBankrupt)
                         {
-                            Exit();
+                            return false;
                         }
                     }
                 }
@@ -303,6 +235,107 @@ namespace NegativeEddy.LemonadeStand
             StreetCrewBuysEverything = false;
 
             return true;
+        }
+
+        private int CalculateGlassesSold(Stand stand)
+        {
+            int GlassesSold;
+            if (StreetCrewBuysEverything)
+            {
+                GlassesSold = stand.GlassesMade;
+            }
+            else if (RuinedByThunderstorm)
+            {
+                return 0;
+            }
+            else
+            {
+                const int MaxPricePerGlassCents = 10;
+                const decimal S2 = 30;
+                decimal N1;
+
+                if (stand.PricePerGlassCents < MaxPricePerGlassCents)
+                {
+                    N1 = (MaxPricePerGlassCents - stand.PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
+                }
+                else
+                {
+                    N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (stand.PricePerGlassCents * stand.PricePerGlassCents);
+                }
+                double W = -stand.SignsMade * 0.5;
+                double V = 1 - Math.Exp(W);
+                double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
+                GlassesSold = (int)tmp;
+
+                if (GlassesSold > stand.GlassesMade)
+                {
+                    // can't sell more glasses than we made
+                    GlassesSold = stand.GlassesMade;
+                }
+            }
+
+            return GlassesSold;
+        }
+
+        private void QueryPriceToSellGlasses(Stand stand)
+        {
+            while (true)
+            {
+                Print();
+                Print("WHAT PRICE (IN CENTS) DO YOU WISH TO CHARGE FOR LEMONADE ");
+                stand.PricePerGlassCents = int.Parse(_io.GetInput());
+                if (stand.PricePerGlassCents > 0 && stand.PricePerGlassCents < 100)
+                {
+                    return;
+                }
+                Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
+            }
+        }
+
+        private void QueryNumberOfSignsToMake(Stand stand)
+        {
+            while (true)
+            {
+                Print();
+                Print($"HOW MANY ADVERTISING SIGNS ({CostPerSignDollars * 100} CENTS EACH) DO YOU WANT TO MAKE ");
+                stand.SignsMade = int.Parse(_io.GetInput());
+                if (stand.SignsMade < 0 || stand.SignsMade > 50)
+                {
+                    Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
+                    continue;
+                }
+
+                if (stand.SignsMade * CostPerSignDollars <= stand.Assets - stand.GlassesMade * CostPerGlassDollars)
+                {
+                    // user has enough money to make signs and glasses
+                    return;
+                }
+
+                Print();
+                decimal tmp = stand.Assets - stand.GlassesMade * CostPerGlassDollars;
+                Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2} IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
+            }
+        }
+
+        private void QueryNumberOfGlassesToMake(Stand stand)
+        {
+            while (true)
+            {
+                Print("HOW MANY GLASSES OF LEMONADE DO YOU WISH TO MAKE ");
+                stand.GlassesMade = int.Parse(_io.GetInput());
+                if (stand.GlassesMade < 0 || stand.GlassesMade > 1000)
+                {
+                    Print("COME ON, LET'S BE REASONABLE NOW!!!\nTRY AGAIN");
+                    continue;
+                }
+
+                if (stand.GlassesMade * CostPerGlassDollars <= stand.Assets)
+                {
+                    // user can purchase that amount of lemonade
+                    return;
+                }
+                Print($"THINK AGAIN!!!  YOU HAVE ONLY {stand.Assets:C2} IN CASH AND TO MAKE {stand.GlassesMade} GLASSES OF LEMONADE YOU NEED ${stand.GlassesMade * CostPerGlassDollars:C2} IN CASH.");
+            }
         }
 
         private void UpdateCostPerGlass()
@@ -429,11 +462,6 @@ namespace NegativeEddy.LemonadeStand
             Print();
             Print("KEEP TRACK OF YOUR ASSETS, BECAUSE YOU CAN'T SPEND MORE MONEY THAN YOU HAVE!   ");
             Print();
-        }
-
-        private void Exit()
-        {
-            throw new GameOverException("Exiting");
         }
     }
 

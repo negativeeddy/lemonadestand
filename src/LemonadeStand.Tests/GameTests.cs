@@ -32,16 +32,13 @@ namespace NegativeEddy.LemonadeStand.Tests
             };
             stand.Init();
             _output.WriteLine("***************************************************************");
-            stand.Step();
+            bool result = stand.Step();
+            Assert.True(result);
             Assert.Equal(0.30M, stand.Stands[0].Assets);
 
-            Assert.Throws<GameOverException>(() =>
-            {
-                _output.WriteLine("***************************************************************");
-                stand.Step();
-                _output.WriteLine("***************************************************************");
-                stand.Step();
-            });
+            _output.WriteLine("***************************************************************");
+            result = stand.Step();
+            Assert.False(result);   // because we went bankrupt
             Assert.Equal(0.00M, stand.Stands[0].Assets);
         }
 

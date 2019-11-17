@@ -21,12 +21,6 @@
             public decimal Assets { get; set; }
 
             /// <summary>
-            /// if everything is ruined by thunderstorm
-            /// originally G(i) : 0 = ruined, 1 = not ruined
-            /// </summary>
-            public bool RuinedByThunderstorm { get; set; }  
-
-            /// <summary>
             /// true if the player is bankrupt and cannot continue
             /// </summary>
             public bool IsBankrupt { get; set; }
