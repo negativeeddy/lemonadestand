@@ -91,7 +91,7 @@ namespace NegativeEddy.LemonadeStand
         /// TODO: make this an enum?
         /// originally SC: 
         /// </summary>
-        private int SkyColor;
+        private SkyColorType SkyColor;
 
         public void Init(decimal intialAssets = 2.0M)
         {
@@ -117,23 +117,24 @@ namespace NegativeEddy.LemonadeStand
 
             Day++;
 
-            SkyColor = _random.Next(10);
-            if (SkyColor < 6)
+            int skyChance = _random.Next(10);
+
+            if (skyChance < 6)
             {
-                SkyColor = 2;
+                SkyColor = SkyColorType.Clear;
             }
-            else if (SkyColor < 8)
+            else if (skyChance < 8)
             {
-                SkyColor = 10;
+                SkyColor = SkyColorType.Cloudy;
             }
             else
             {
-                SkyColor = 7;
+                SkyColor = SkyColorType.Hot;
             }
 
             if (Day < 3)
             {
-                SkyColor = 2;
+                SkyColor = SkyColorType.Hot;
             }
 
             UpdateCostPerGlass();
@@ -170,10 +171,10 @@ namespace NegativeEddy.LemonadeStand
 
             Print();
 
-            if (SkyColor == 10 && _random.Next(100) < 25)
+            if (SkyColor == SkyColorType.Cloudy && _random.Next(100) < 25)
             {
                 // thunderstorm happened
-                SkyColor = 5;
+                SkyColor = SkyColorType.Thunderstorms;
                 RuinedByThunderstorm = true;
                 Print("WEATHER REPORT:  A SEVERE THUNDERSTORM HIT LEMONSVILLE EARLIER TODAY, JUST AS THE LEMONADE STANDS WERE BEING SET UP. UNFORTUNATELY, EVERYTHING WAS RUINED!!");
             }
@@ -370,11 +371,11 @@ namespace NegativeEddy.LemonadeStand
         {
             switch (SkyColor)
             {
-                case 7:
+                case SkyColorType.Hot:
                     Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
                     WeatherFactor = 2;
                     break;
-                case 10:
+                case SkyColorType.Cloudy:
                     if (_random.Next(100) > 25)
                     {
                         int chanceOfRain = 30 + _random.Next(5) * 10;
@@ -465,13 +466,11 @@ namespace NegativeEddy.LemonadeStand
         }
     }
 
-    /// <summary>
-    /// Temporary solution to the fact that the original source just quit the process
-    /// </summary>
-    public class GameOverException : Exception
+    public enum SkyColorType
     {
-        public GameOverException(string message) : base(message)
-        {
-        }
+        Clear = 2,
+        Hot = 7,
+        Cloudy = 10,
+        Thunderstorms = 5,
     }
 }
