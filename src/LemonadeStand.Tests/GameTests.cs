@@ -28,6 +28,7 @@ namespace NegativeEddy.LemonadeStand.Tests
 
 
             var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
+            stand.AddNewLinesToOutput = false;
             stand.Init();
             _output.WriteLine("***************************************************************");
             stand.Step();
@@ -67,6 +68,7 @@ namespace NegativeEddy.LemonadeStand.Tests
             };
 
             var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
+            stand.AddNewLinesToOutput = false;
             stand.Init();
             stand.Step();
             Assert.Equal(1.85M, stand.Stands[0].Assets);
@@ -112,6 +114,8 @@ namespace NegativeEddy.LemonadeStand.Tests
             };
 
             var stand = new LemonadeStand.Game(new TestIO(story, _output), new ConstantRandom(0));
+            stand.AddNewLinesToOutput = false;
+
             stand.Init();
             stand.Step();   // player 1
             Assert.Equal(1.85M, stand.Stands[0].Assets);

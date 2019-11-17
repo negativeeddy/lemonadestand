@@ -14,59 +14,90 @@ namespace NegativeEddy.LemonadeStand
             _random = random;
         }
 
+        public bool AddNewLinesToOutput { get; set; } = true;
+
         protected void Print(string text)
         {
-            _io.Output(text + Environment.NewLine);
+            if (AddNewLinesToOutput)
+            {
+                _io.Output(text + Environment.NewLine);
+            }
+            else
+            {
+                _io.Output(text);
+            }
         }
 
         protected void Print()
         {
-            _io.Output(Environment.NewLine);
+            if (AddNewLinesToOutput)
+            {
+                _io.Output(Environment.NewLine);
+            }
+            else
+            {
+                _io.Output("");
+            }
         }
 
         /// <summary>
         /// Day of simulation
         /// </summary>
-        public int Day { get; set; }
-
-        public Stand[]? Stands { get; set; }
-
-        private int CostPerGlassCents; // C: cost of lemonade per glass, in cents 
-        private int MaxPricePerGlassCents;
-        // WeatherFactor: weather factor; 
-        // 1 for good weather,
-        // 0>WeatherFactor<1 for poor weather;   
-        // also adjusts traffic for things like street crews working 
-        private double WeatherFactor;
-        private bool StreetCrewBuysAll; // R2: set to 2 half the time when street department is working;   indicates that street crew bought all lemonade at lunch 
-        private decimal CostPerSignDollars; // S3: cost per advertising sign, in dollars 
-        private int S2; // number of players?
-        private decimal InitialAssets; // initial cash?
-
-        private decimal CostPerGlassDollars;
-        private int C2;
+        public int Day { get; set; } = 0;
 
         /// <summary>
-        /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy).  // TODO: make this an enum?
+        /// The list of stands in play
+        /// </summary>
+        public Stand[]? Stands { get; set; }
+
+        /// <summary>
+        /// cost of lemonade per glass, in cents 
+        /// </summary>
+        private int CostPerGlassCents;
+
+        /// <summary>
+        /// The most you are allowed to charge per glass
+        /// </summary>
+        private int MaxPricePerGlassCents = 10;
+
+        /// <summary>
+        /// Weather Factor
+        /// 1 for good weather,
+        /// 0>WeatherFactor<1 for poor weather;   
+        /// also adjusts traffic for things like street crews working 
+        /// </summary>
+        private double WeatherFactor;
+
+        /// <summary>
+        /// indicates that street crew bought all lemonade at lunch 
+        /// this happens half the time when street department is working   
+        /// </summary>
+        private bool StreetCrewBuysAll;
+
+        /// <summary>
+        /// cost per advertising sign, in dollars 
+        /// </summary>
+        private decimal CostPerSignDollars = 0.15M; 
+        
+        /// <summary>
+        /// Initial cash assets in dollars
+        /// </summary>
+        private decimal InitialAssets = 2.00M; 
+
+        /// <summary>
+        /// cost to make a glass of lemonade, in dollars
+        /// </summary>
+        private decimal CostPerGlassDollars;
+
+        /// <summary>
+        /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
+        /// TODO: make this an enum?
         /// originally SC: 
         /// </summary>
         private int SkyColor;
 
         public void Init()
         {
-            L135_Initialize();
-        }
-
-        private void L135_Initialize()
-        {
-
-            Day = 0;
-            MaxPricePerGlassCents = 10;
-            CostPerSignDollars = .15M;
-            S2 = 30;
-            InitialAssets = 2.00M;
-            C2 = 1;
-
             TitlePage();
             int numPlayers = GetPlayerCount();
             Stands = new Stand[numPlayers];
@@ -74,10 +105,9 @@ namespace NegativeEddy.LemonadeStand
             {
                 Stands[i] = new Stand(InitialAssets);
             }
-            Sub13000_NewBusiness();
+            NewBusiness();
         }
 
-        private int J_ChanceOfRain;
 
         public bool Step()
         {
@@ -135,7 +165,7 @@ namespace NegativeEddy.LemonadeStand
 
             if (Day > 2)
             {
-                Sub2000_RandomEvents();
+                RandomEvents();
             }
 
             int i = 0;
@@ -152,7 +182,7 @@ namespace NegativeEddy.LemonadeStand
                     Print("FOR YOU TO MAKE.");
                     if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassCents)
                     {
-                        Sub31111_Exit();
+                        Exit();
                     }
                 }
                 else
@@ -221,7 +251,7 @@ namespace NegativeEddy.LemonadeStand
             Print();
             if (SkyColor == 10 && _random.Next(100) < 25)
             {
-                Sub2300_Thunderstorm_Then1185();
+                Thunderstorm();
             }
             else
             {
@@ -248,6 +278,7 @@ namespace NegativeEddy.LemonadeStand
                 if (!StreetCrewBuysAll)
                 {
                     decimal N1;
+                    const decimal S2 = 30;
 
                     if (stand.PricePerGlassCents < MaxPricePerGlassCents)
                     {
@@ -258,7 +289,7 @@ namespace NegativeEddy.LemonadeStand
                         N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (stand.PricePerGlassCents * stand.PricePerGlassCents);
                     }
                     double W = -stand.SignsMade * 0.5;
-                    double V = 1 - Math.Exp(W) * C2;
+                    double V = 1 - Math.Exp(W);
                     double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
                     GlassesSold = stand.RuinedByThunderstorm ? 0 : (int)tmp;
                     if (GlassesSold > stand.GlassesMade)
@@ -278,7 +309,7 @@ namespace NegativeEddy.LemonadeStand
 
                 if (stand.H == 1)
                 {
-                    Sub2300_Thunderstorm_Then1185();
+                    Thunderstorm();
                     continue;   // to 1185
                 }
                 Print();
@@ -286,11 +317,11 @@ namespace NegativeEddy.LemonadeStand
                 {
                     Print($"STAND {i}");
                     Print("  BANKRUPT");
-                    Sub18000_SpaceToContinue();
+                    SpaceToContinue();
                 }
                 else
                 {
-                    Sub5000_DailyReport(new DailyResult
+                    PrintDailyReport(new DailyResult
                     {
                         Day = Day,
                         Stand = stand,
@@ -301,7 +332,7 @@ namespace NegativeEddy.LemonadeStand
                         GlassesSold = GlassesSold,
                     });
 
-                    Sub18000_SpaceToContinue();
+                    SpaceToContinue();
 
                     if (stand.Assets <= CostPerGlassCents / 100)
                     {
@@ -309,10 +340,10 @@ namespace NegativeEddy.LemonadeStand
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
                         stand.IsBankrupt = true;
-                        Sub18000_SpaceToContinue();
+                        SpaceToContinue();
                         if (Stands.Length == 1 && Stands[0].IsBankrupt)
                         {
-                            Sub31111_Exit();
+                            Exit();
                         }
                     }
                 }
@@ -324,11 +355,12 @@ namespace NegativeEddy.LemonadeStand
             return true;
         }
 
-        private void Sub2000_RandomEvents()
+        private void RandomEvents()
         {
             if (SkyColor == 7)
             {
-                Sub2410();
+                PrintHeatWave();
+                WeatherFactor = 2;
                 return;
             }
 
@@ -339,10 +371,10 @@ namespace NegativeEddy.LemonadeStand
 
             if (_random.Next(100) > 25)
             {
-                J_ChanceOfRain = 30 + _random.Next(5) * 10;
-                Print($"THERE IS A {J_ChanceOfRain}% CHANCE OF LIGHT RAIN,");
+                int chanceOfRain = 30 + _random.Next(5) * 10;
+                Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN,");
                 Print("AND THE WEATHER IS COOLER TODAY.");
-                WeatherFactor = 1 - J_ChanceOfRain / 100.0d;
+                WeatherFactor = 1 - chanceOfRain / 100.0d;
                 return;
             }
 
@@ -367,7 +399,7 @@ namespace NegativeEddy.LemonadeStand
             Print("LEMONADE AT LUNCHTIME!!");
         }
 
-        private void Sub2300_Thunderstorm_Then1185()
+        private void Thunderstorm()
         {
             SkyColor = 5;
             Print("WEATHER REPORT:  A SEVERE THUNDERSTORM");
@@ -381,10 +413,9 @@ namespace NegativeEddy.LemonadeStand
             }
         }
 
-        private void Sub2410()
+        private void PrintHeatWave()
         {
             Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
-            WeatherFactor = 2;
         }
 
         private struct DailyResult
@@ -398,7 +429,7 @@ namespace NegativeEddy.LemonadeStand
             public int GlassesSold;
         }
 
-        private void Sub5000_DailyReport(DailyResult result)
+        private void PrintDailyReport(DailyResult result)
         {
             Print($"   DAY {result.Day} STAND {result.StandNumber}");
             Print();
@@ -445,18 +476,17 @@ namespace NegativeEddy.LemonadeStand
         {
             int playerCount = -1;
 
-            do
+            while (playerCount < 1 || playerCount > 30)
             {
                 Print("HOW MANY PEOPLE WILL BE PLAYING?");
                 string NS = _io.GetInput();
-                playerCount = int.Parse(NS);
+                int.TryParse (NS, out playerCount);
             }
-            while (playerCount < 1 || playerCount > 30);
 
             return playerCount;
         }
 
-        private void Sub13000_NewBusiness()
+        private void NewBusiness()
         {
             Print("TO MANAGE YOUR LEMONADE STAND, YOU WILL ");
             Print("NEED TO MAKE THESE DECISIONS EVERY DAY: ");
@@ -465,12 +495,12 @@ namespace NegativeEddy.LemonadeStand
             Print("2. HOW MANY ADVERTISING SIGNS TO MAKE      (THE SIGNS COST FIFTEEN CENTS EACH)  ");
             Print("3. WHAT PRICE TO CHARGE FOR EACH GLASS  ");
             Print();
-            Print("YOU WILL BEGIN WITH $2.00 CASH (ASSETS).");
+            Print($"YOU WILL BEGIN WITH {InitialAssets:C2} CASH (ASSETS).");
             Print("BECAUSE YOUR MOTHER GAVE YOU SOME SUGAR,");
             Print("YOUR COST TO MAKE LEMONADE IS TWO CENTS ");
             Print("A GLASS (THIS MAY CHANGE IN THE FUTURE).");
             Print();
-            Sub18000_SpaceToContinue();
+            SpaceToContinue();
 
             Print("YOUR EXPENSES ARE THE SUM OF THE COST OF");
             Print("THE LEMONADE AND THE COST OF THE SIGNS. ");
@@ -486,21 +516,21 @@ namespace NegativeEddy.LemonadeStand
             Print("CAN'T SPEND MORE MONEY THAN YOU HAVE!   ");
             Print();
 
-            Sub18000_SpaceToContinue();
+            SpaceToContinue();
         }
 
 
-        void Sub18000_SpaceToContinue()
+        void SpaceToContinue()
         {
             Print(" PRESS ENTER TO CONTINUE, Q TO END...");
             string INS = _io.GetInput();
             if (INS == "Q")
             {
-                Sub31111_Exit();
+                Exit();
             }
         }
 
-        private void Sub31111_Exit()
+        private void Exit()
         {
             throw new GameOverException("Exiting");
         }
