@@ -43,12 +43,12 @@ namespace NegativeEddy.LemonadeStand
         /// <summary>
         /// Day of simulation
         /// </summary>
-        public int Day { get; set; } = 0;
+        public int Day { get; private set; } = 0;
 
         /// <summary>
         /// The list of stands in play
         /// </summary>
-        public Stand[]? Stands { get; set; }
+        public Stand[]? Stands { get; private set; }
 
         /// <summary>
         /// Weather Factor
