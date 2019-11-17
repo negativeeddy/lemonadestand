@@ -51,16 +51,6 @@ namespace NegativeEddy.LemonadeStand
         public Stand[]? Stands { get; set; }
 
         /// <summary>
-        /// cost of lemonade per glass, in cents 
-        /// </summary>
-        private int CostPerGlassCents;
-
-        /// <summary>
-        /// The most you are allowed to charge per glass
-        /// </summary>
-        private int MaxPricePerGlassCents = 10;
-
-        /// <summary>
         /// Weather Factor
         /// 1 for good weather,
         /// 0>WeatherFactor<1 for poor weather;   
@@ -139,19 +129,18 @@ namespace NegativeEddy.LemonadeStand
             Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
             if (Day < 3)
             {
-                CostPerGlassCents = 2;
+                CostPerGlassDollars = 0.02M;
             }
             else if (Day < 7)
             {
-                CostPerGlassCents = 4;
+                CostPerGlassDollars = 0.04M;
             }
             else
             {
-                CostPerGlassCents = 5;
+                CostPerGlassDollars = 0.05M;
             }
-            Print($"$.0{CostPerGlassCents}");
+            Print($"{CostPerGlassDollars:C2}");
             Print();
-            CostPerGlassDollars = CostPerGlassCents * .01M;
             WeatherFactor = 1;
 
             if (Day == 3)
@@ -180,7 +169,7 @@ namespace NegativeEddy.LemonadeStand
                 {
                     Print("YOU ARE BANKRUPT, NO DECISIONS");
                     Print("FOR YOU TO MAKE.");
-                    if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassCents)
+                    if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassDollars)
                     {
                         Exit();
                     }
@@ -277,8 +266,9 @@ namespace NegativeEddy.LemonadeStand
 
                 if (!StreetCrewBuysAll)
                 {
-                    decimal N1;
+                    const int MaxPricePerGlassCents = 10;
                     const decimal S2 = 30;
+                    decimal N1;
 
                     if (stand.PricePerGlassCents < MaxPricePerGlassCents)
                     {
@@ -334,7 +324,7 @@ namespace NegativeEddy.LemonadeStand
 
                     SpaceToContinue();
 
-                    if (stand.Assets <= CostPerGlassCents / 100)
+                    if (stand.Assets <= CostPerGlassDollars)
                     {
                         Print($"STAND {i}");
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
