@@ -273,17 +273,16 @@ namespace NegativeEddy.LemonadeStand
                     GlassesSold = stand.GlassesMade;
                 }
 
-                decimal Income = GlassesSold * stand.PricePerGlassCents * .01M;
-                decimal Expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
-                decimal Profit = Income - Expenses;
-                stand.Assets += Profit;
+                decimal income = GlassesSold * stand.PricePerGlassCents * .01M;
+                decimal expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
+                decimal profit = income - expenses;
+                stand.Assets += profit;
 
                 Print();
                 if (stand.IsBankrupt)
                 {
                     Print($"STAND {stand.Id}");
                     Print("  BANKRUPT");
-                    SpaceToContinue();
                 }
                 else
                 {
@@ -291,13 +290,11 @@ namespace NegativeEddy.LemonadeStand
                     {
                         Day = Day,
                         Stand = stand,
-                        Income = Income,
-                        Expenses = Expenses,
-                        Profit = Profit,
+                        Income = income,
+                        Expenses = expenses,
+                        Profit = profit,
                         GlassesSold = GlassesSold,
                     });
-
-                    SpaceToContinue();
 
                     if (stand.Assets <= CostPerGlassDollars)
                     {
@@ -305,7 +302,6 @@ namespace NegativeEddy.LemonadeStand
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
                         stand.IsBankrupt = true;
-                        SpaceToContinue();
                         if (Stands.Length == 1 && Stands[0].IsBankrupt)
                         {
                             Exit();
@@ -483,7 +479,6 @@ namespace NegativeEddy.LemonadeStand
             Print("YOUR COST TO MAKE LEMONADE IS TWO CENTS ");
             Print("A GLASS (THIS MAY CHANGE IN THE FUTURE).");
             Print();
-            SpaceToContinue();
 
             Print("YOUR EXPENSES ARE THE SUM OF THE COST OF");
             Print("THE LEMONADE AND THE COST OF THE SIGNS. ");
@@ -498,19 +493,6 @@ namespace NegativeEddy.LemonadeStand
             Print("KEEP TRACK OF YOUR ASSETS, BECAUSE YOU  ");
             Print("CAN'T SPEND MORE MONEY THAN YOU HAVE!   ");
             Print();
-
-            SpaceToContinue();
-        }
-
-
-        void SpaceToContinue()
-        {
-            Print(" PRESS ENTER TO CONTINUE, Q TO END...");
-            string INS = _io.GetInput();
-            if (INS == "Q")
-            {
-                Exit();
-            }
         }
 
         private void Exit()

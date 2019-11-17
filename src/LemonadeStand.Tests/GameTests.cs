@@ -19,11 +19,10 @@ namespace NegativeEddy.LemonadeStand.Tests
         {
             string[] story = new string[]
             {
-                "1","","",
+                "1",
                  // glasses, signs, price, enter
-                "100","0","1","",    // day 1, spend all the money
-                "0","2","1","",      // day 2, just buy signs with the profits from day 1
-                "",
+                "100","0","1",    // day 1, spend all the money
+                "0","2","1",     // day 2, just buy signs with the profits from day 1
             };
 
 
@@ -51,22 +50,19 @@ namespace NegativeEddy.LemonadeStand.Tests
         {
             string[] story = new string[]
             {
-                "1","","",
+                "1",
 
                 "10", // 10 glasses
                 "3", // 3 signs
                 "5", // 5 cents/glass
-                "",
 
                 "10", // 10 glasses
                 "3", // 3 signs
                 "5", // 5 cents/glass
-                "",
 
                 "10", // 10 glasses
                 "3", // 3 signs
                 "5", // 5 cents/glass
-                "",
             };
 
             var stand = new Game(new TestIO(story, _output), new ConstantRandom(0))
@@ -86,7 +82,7 @@ namespace NegativeEddy.LemonadeStand.Tests
         {
             string[] story = new string[]
             {
-                "2","","",
+                "2",
 
                 "10", // 10 glasses   = .20
                 "3", // 3 signs       = .45
@@ -95,8 +91,8 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "5", // 5 glasses     = .10
                 "1", // 1 signs       = .15
                 "3", // 3 cents/glass = .15
-                "",  // profit = -0.15
-                "",  // profit = -0.10
+                  // profit = -0.15
+                  // profit = -0.10
 
                 "10", // 10 glasses
                 "3", // 3 signs
@@ -104,8 +100,8 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "5", // 10 glasses
                 "1", // 3 signs
                 "3", // 5 cents/glass
-                "",
-                "",  // profit = -0.00
+                
+                  // profit = -0.00
 
                 "10", // 10 glasses   = .40
                 "3", // 3 signs       = .45
@@ -113,8 +109,8 @@ namespace NegativeEddy.LemonadeStand.Tests
                 "5", // 5 glasses     = .20
                 "1", // 1 signs       = .15
                 "3", // 3 cents/glass = .15
-                "",  // profit = -0.45
-                "",  // profit = -0.20
+                  // profit = -0.45
+                  // profit = -0.20
             };
 
             var stand = new Game(new TestIO(story, _output), new ConstantRandom(0))
