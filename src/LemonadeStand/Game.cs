@@ -51,20 +51,6 @@ namespace NegativeEddy.LemonadeStand
         public Stand[]? Stands { get; private set; }
 
         /// <summary>
-        /// Weather Factor
-        /// 1 for good weather,
-        /// 0>WeatherFactor<1 for poor weather;   
-        /// also adjusts traffic for things like street crews working 
-        /// </summary>
-        private double WeatherFactor;
-
-        /// <summary>
-        /// indicates that street crew bought all lemonade at lunch 
-        /// this happens half the time when street department is working   
-        /// </summary>
-        private bool StreetCrewBuysEverything;
-
-        /// <summary>
         /// cost per advertising sign, in dollars 
         /// </summary>
         public decimal CostPerSignDollars { get; set; } = 0.15M;
@@ -79,11 +65,6 @@ namespace NegativeEddy.LemonadeStand
         /// </summary>
         public decimal CostPerGlassDollars { get; private set; }
 
-        /// <summary>
-        /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy). 
-        /// TODO: make this an enum?
-        /// originally SC: 
-        /// </summary>
         private SkyOutlook Sky;
 
         public void Init(decimal intialAssets = 2.0M)
@@ -111,6 +92,15 @@ namespace NegativeEddy.LemonadeStand
             Day++;
             bool ruinedByThunderstorm = false;
 
+            // 1 for good weather,
+            // 0>WeatherFactor<1 for poor weather;   
+            // also adjusts traffic for things like street crews working 
+            double weatherFactor = 1;
+
+            // indicates that street crew bought all lemonade at lunch 
+            // this happens half the time when street department is working   
+            bool streetCrewBuysEverything = false;
+
             int skyChance = _random.Next(10);
 
             if (skyChance < 6)
@@ -133,10 +123,9 @@ namespace NegativeEddy.LemonadeStand
 
             UpdateCostPerGlass();
 
-            WeatherFactor = 1;
             if (Day > 2)
             {
-                RandomEvents();
+                (weatherFactor, streetCrewBuysEverything) = RandomEvents();
             }
 
 
@@ -176,7 +165,7 @@ namespace NegativeEddy.LemonadeStand
                 Print("$$ LEMONSVILLE DAILY FINANCIAL REPORT $$");
                 Print();
 
-                if (StreetCrewBuysEverything)
+                if (streetCrewBuysEverything)
                 {
                     Print("THE STREET CREWS BOUGHT ALL YOUR LEMONADE AT LUNCHTIME!!");
                     Print();
@@ -190,7 +179,7 @@ namespace NegativeEddy.LemonadeStand
                     stand.Assets = 0;
                 }
 
-                int GlassesSold = CalculateGlassesSold(stand, StreetCrewBuysEverything, ruinedByThunderstorm);
+                int GlassesSold = CalculateGlassesSold(stand, weatherFactor, streetCrewBuysEverything, ruinedByThunderstorm);
 
                 decimal income = GlassesSold * stand.PricePerGlassCents * .01M;
                 decimal expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
@@ -225,13 +214,11 @@ namespace NegativeEddy.LemonadeStand
                 }
             }
 
-            WeatherFactor = 1;
-            StreetCrewBuysEverything = false;
 
             return true;
         }
 
-        private int CalculateGlassesSold(Stand stand, bool streetCrewBuysEverything, bool ruinedByThunderstorm)
+        private int CalculateGlassesSold(Stand stand, double weatherFactor, bool streetCrewBuysEverything, bool ruinedByThunderstorm)
         {
             int GlassesSold;
             if (streetCrewBuysEverything)
@@ -258,7 +245,7 @@ namespace NegativeEddy.LemonadeStand
                 }
                 double W = -stand.SignsMade * 0.5;
                 double V = 1 - Math.Exp(W);
-                double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
+                double tmp = weatherFactor * ((double)N1 + (double)N1 * V);
                 GlassesSold = (int)tmp;
 
                 if (GlassesSold > stand.GlassesMade)
@@ -360,20 +347,23 @@ namespace NegativeEddy.LemonadeStand
             Print();
         }
 
-        private void RandomEvents()
+        private (double weatherFactor, bool streetCrewBuysEverything) RandomEvents()
         {
+            double weatherFactor = 1;
+            bool streetCrewBuysEverything = false;
+
             switch (Sky)
             {
                 case SkyOutlook.HotAndDry:
                     Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
-                    WeatherFactor = 2;
+                    weatherFactor = 2;
                     break;
                 case SkyOutlook.Cloudy:
                     if (_random.Next(100) > 25)
                     {
                         int chanceOfRain = 30 + _random.Next(5) * 10;
                         Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN, AND THE WEATHER IS COOLER TODAY.");
-                        WeatherFactor = 1 - chanceOfRain / 100.0d;
+                        weatherFactor = 1 - chanceOfRain / 100.0d;
                     }
                     else
                     {
@@ -381,16 +371,17 @@ namespace NegativeEddy.LemonadeStand
 
                         if (_random.Next(100) < 50)
                         {
-                            WeatherFactor = 0.1;
+                            weatherFactor = 0.1;
                         }
                         else
                         {
                             // 50% of the time the street crew buys all the lemonade
-                            StreetCrewBuysEverything = true;
+                            streetCrewBuysEverything = true;
                         }
                     }
                     break;
             }
+            return (weatherFactor, streetCrewBuysEverything);
         }
 
         private struct DailyResult
