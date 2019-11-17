@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace NegativeEddy.LemonadeStand
 {
@@ -32,8 +33,6 @@ namespace NegativeEddy.LemonadeStand
 
         private int CostPerGlassCents; // C: cost of lemonade per glass, in cents 
         private int MaxPricePerGlassCents;
-        private int I; // I: current player number, 1 to N 
-        private int NumberOfPlayers; //N: number of players 
         // WeatherFactor: weather factor; 
         // 1 for good weather,
         // 0>WeatherFactor<1 for poor weather;   
@@ -53,7 +52,7 @@ namespace NegativeEddy.LemonadeStand
         /// sky color (2=sunny, 5=thunderstorms, 7=hot & dry, 10=cloudy).  // TODO: make this an enum?
         /// originally SC: 
         /// </summary>
-        private int SkyColor; 
+        private int SkyColor;
 
         public void Init()
         {
@@ -62,7 +61,6 @@ namespace NegativeEddy.LemonadeStand
 
         private void L135_Initialize()
         {
-            Stands = new Stand[30];
 
             Day = 0;
             MaxPricePerGlassCents = 10;
@@ -72,10 +70,12 @@ namespace NegativeEddy.LemonadeStand
             C9 = 0.5;
             C2 = 1;
 
-            Sub12000_TitlePage();
-            for (I = 0; I < NumberOfPlayers; I++)
+            TitlePage();
+            int numPlayers = GetPlayerCount();
+            Stands = new Stand[numPlayers];
+            for (int i = 0; i < numPlayers; i++)
             {
-                Stands[I] = new Stand(InitialAssets);
+                Stands[i] = new Stand(InitialAssets);
             }
             Sub13000_NewBusiness();
         }
@@ -128,11 +128,7 @@ namespace NegativeEddy.LemonadeStand
             Print();
             CostPerGlassDollars = CostPerGlassCents * .01M;
             WeatherFactor = 1;
-            Sub600_CurrentEvents();
-        }
 
-        private void Sub600_CurrentEvents()
-        {
             if (Day == 3)
             {
                 Print("(YOUR MOTHER QUIT GIVING YOU FREE SUGAR)");
@@ -147,17 +143,19 @@ namespace NegativeEddy.LemonadeStand
                 Sub2000_RandomEvents();
             }
 
-            for (I = 0; I < NumberOfPlayers; I++)
+            int i = 0;
+            foreach (Stand stand in Stands)
             {
-                Stands[I].RuinedByThunderstorm = false;
-                Stands[I].H = 0;
-                Print($"LEMONADE STAND {I} ASSETS {Stands[I].Assets:C2}");
+                i++;
+                stand.RuinedByThunderstorm = false;
+                stand.H = 0;
+                Print($"LEMONADE STAND {i} ASSETS {stand.Assets:C2}");
                 Print();
-                if (Stands[I].IsBankrupt)
+                if (stand.IsBankrupt)
                 {
                     Print("YOU ARE BANKRUPT, NO DECISIONS");
                     Print("FOR YOU TO MAKE.");
-                    if (NumberOfPlayers == 1 && Stands[0].Assets < CostPerGlassCents)
+                    if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassCents)
                     {
                         Sub31111_Exit();
                     }
@@ -168,22 +166,22 @@ namespace NegativeEddy.LemonadeStand
                     {
                         Print("HOW MANY GLASSES OF LEMONADE DO YOU");
                         Print("WISH TO MAKE ");
-                        Stands[I].GlassesMade = int.Parse(_io.GetInput());
-                        if (Stands[I].GlassesMade < 0 || Stands[I].GlassesMade > 1000)
+                        stand.GlassesMade = int.Parse(_io.GetInput());
+                        if (stand.GlassesMade < 0 || stand.GlassesMade > 1000)
                         {
                             Print("COME ON, LET'S BE REASONABLE NOW!!!");
                             Print("TRY AGAIN");
                             continue;
                         }
 
-                        if (Stands[I].GlassesMade * CostPerGlassDollars <= Stands[I].Assets)
+                        if (stand.GlassesMade * CostPerGlassDollars <= stand.Assets)
                         {
                             // user can purchase that amount of lemonade
                             break;
                         }
-                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {Stands[I].Assets:C2} ");
-                        Print($"IN CASH AND TO MAKE {Stands[I].GlassesMade} GLASSES OF ");
-                        Print($"LEMONADE YOU NEED ${Stands[I].GlassesMade * CostPerGlassDollars:C2} IN CASH.");
+                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {stand.Assets:C2} ");
+                        Print($"IN CASH AND TO MAKE {stand.GlassesMade} GLASSES OF ");
+                        Print($"LEMONADE YOU NEED ${stand.GlassesMade * CostPerGlassDollars:C2} IN CASH.");
                     }
 
                     while (true)
@@ -191,20 +189,20 @@ namespace NegativeEddy.LemonadeStand
                         Print();
                         Print($"HOW MANY ADVERTISING SIGNS ({CostPerSignDollars * 100} CENTS");
                         Print($"EACH) DO YOU WANT TO MAKE ");
-                        Stands[I].SignsMade = int.Parse(_io.GetInput());
-                        if (Stands[I].SignsMade < 0 || Stands[I].SignsMade > 50)
+                        stand.SignsMade = int.Parse(_io.GetInput());
+                        if (stand.SignsMade < 0 || stand.SignsMade > 50)
                         {
                             Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
                             continue;
                         }
 
-                        if (Stands[I].SignsMade * CostPerSignDollars <= Stands[I].Assets - Stands[I].GlassesMade * CostPerGlassDollars)
+                        if (stand.SignsMade * CostPerSignDollars <= stand.Assets - stand.GlassesMade * CostPerGlassDollars)
                         {
                             break;
                         }
 
                         Print();
-                        decimal tmp = Stands[I].Assets - Stands[I].GlassesMade * CostPerGlassDollars;
+                        decimal tmp = stand.Assets - stand.GlassesMade * CostPerGlassDollars;
                         Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2}");
                         Print("IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
                     }
@@ -214,8 +212,8 @@ namespace NegativeEddy.LemonadeStand
                         Print();
                         Print("WHAT PRICE (IN CENTS) DO YOU WISH TO");
                         Print("CHARGE FOR LEMONADE ");
-                        Stands[I].PricePerGlassCents = int.Parse(_io.GetInput());
-                        if (Stands[I].PricePerGlassCents <= 0 || Stands[I].PricePerGlassCents >= 100)
+                        stand.PricePerGlassCents = int.Parse(_io.GetInput());
+                        if (stand.PricePerGlassCents <= 0 || stand.PricePerGlassCents >= 100)
                         {
                             Print("COME ON, BE REASONABLE!!! TRY AGAIN.");
                             continue;
@@ -241,53 +239,55 @@ namespace NegativeEddy.LemonadeStand
                 }
             }
 
-            for (I = 0; I < NumberOfPlayers; I++)
+            i = 0;
+            foreach (Stand stand in Stands)
             {
-                if (Stands[I].Assets < 0)
+                i++;
+                if (stand.Assets < 0)
                 {
-                    Stands[I].Assets = 0;
+                    stand.Assets = 0;
                 }
 
                 int GlassesSold;
 
                 if (R2 != 2)
                 {
-                    if (Stands[I].PricePerGlassCents < MaxPricePerGlassCents)
+                    if (stand.PricePerGlassCents < MaxPricePerGlassCents)
                     {
-                        N1 = (MaxPricePerGlassCents - Stands[I].PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
+                        N1 = (MaxPricePerGlassCents - stand.PricePerGlassCents) / MaxPricePerGlassCents * .8M * S2 + S2;
                     }
                     else
                     {
-                        N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (Stands[I].PricePerGlassCents * Stands[I].PricePerGlassCents);
+                        N1 = MaxPricePerGlassCents * MaxPricePerGlassCents * S2 / (stand.PricePerGlassCents * stand.PricePerGlassCents);
                     }
-                    double W = -Stands[I].SignsMade * C9;
+                    double W = -stand.SignsMade * C9;
                     double V = 1 - Math.Exp(W) * C2;
                     double tmp = WeatherFactor * ((double)N1 + (double)N1 * V);
-                    GlassesSold = Stands[I].RuinedByThunderstorm ? 0 : (int)tmp;
-                    if (GlassesSold > Stands[I].GlassesMade)
+                    GlassesSold = stand.RuinedByThunderstorm ? 0 : (int)tmp;
+                    if (GlassesSold > stand.GlassesMade)
                     {
-                        GlassesSold = Stands[I].GlassesMade;
+                        GlassesSold = stand.GlassesMade;
                     }
                 }
                 else
                 {
-                    GlassesSold = Stands[I].GlassesMade;
+                    GlassesSold = stand.GlassesMade;
                 }
 
-                decimal Income = GlassesSold * Stands[I].PricePerGlassCents * .01M;
-                decimal Expenses = Stands[I].SignsMade * CostPerSignDollars + Stands[I].GlassesMade * CostPerGlassDollars;
+                decimal Income = GlassesSold * stand.PricePerGlassCents * .01M;
+                decimal Expenses = stand.SignsMade * CostPerSignDollars + stand.GlassesMade * CostPerGlassDollars;
                 decimal Profit = Income - Expenses;
-                Stands[I].Assets = Stands[I].Assets + Profit;
+                stand.Assets = stand.Assets + Profit;
 
-                if (Stands[I].H == 1)
+                if (stand.H == 1)
                 {
                     Sub2300_Thunderstorm_Then1185();
                     continue;   // to 1185
                 }
                 Print();
-                if (Stands[I].IsBankrupt)
+                if (stand.IsBankrupt)
                 {
-                    Print($"STAND {I}");
+                    Print($"STAND {i}");
                     Print("  BANKRUPT");
                     Sub18000_SpaceToContinue();
                 }
@@ -296,8 +296,8 @@ namespace NegativeEddy.LemonadeStand
                     Sub5000_DailyReport(new DailyResult
                     {
                         Day = Day,
-                        Stand = Stands[I],
-                        StandNumber = I,
+                        Stand = stand,
+                        StandNumber = i,
                         Income = Income,
                         Expenses = Expenses,
                         Profit = Profit,
@@ -306,14 +306,14 @@ namespace NegativeEddy.LemonadeStand
 
                     Sub18000_SpaceToContinue();
 
-                    if (Stands[I].Assets <= CostPerGlassCents / 100)
+                    if (stand.Assets <= CostPerGlassCents / 100)
                     {
-                        Print($"STAND {I}");
+                        Print($"STAND {i}");
                         Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
                         Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
-                        Stands[I].IsBankrupt = true;
+                        stand.IsBankrupt = true;
                         Sub18000_SpaceToContinue();
-                        if (NumberOfPlayers == 1 && Stands[0].IsBankrupt)
+                        if (Stands.Length == 1 && Stands[0].IsBankrupt)
                         {
                             Sub31111_Exit();
                         }
@@ -331,7 +331,7 @@ namespace NegativeEddy.LemonadeStand
                 Sub2410();
                 return;
             }
-            
+
             if (SkyColor != 10)
             {
                 return;
@@ -375,9 +375,9 @@ namespace NegativeEddy.LemonadeStand
             Print("THE LEMONADE STANDS WERE BEING SET UP.");
             Print("UNFORTUNATELY, EVERYTHING WAS RUINED!!");
 
-            for (int J = 0; J < NumberOfPlayers; J++)
+            foreach (Stand stand in Stands)
             {
-                Stands[J].RuinedByThunderstorm = true;
+                stand.RuinedByThunderstorm = true;
             }
         }
 
@@ -395,7 +395,7 @@ namespace NegativeEddy.LemonadeStand
             public decimal Income;
             public decimal Profit;
             public decimal Expenses;
-            public int GlassesSold;                
+            public int GlassesSold;
         }
 
         private void Sub5000_DailyReport(DailyResult result)
@@ -428,7 +428,7 @@ namespace NegativeEddy.LemonadeStand
 
         }
 
-        private void Sub12000_TitlePage()
+        private void TitlePage()
         {
             Print("HI!  WELCOME TO LEMONSVILLE, CALIFORNIA!");
             Print();
@@ -439,14 +439,21 @@ namespace NegativeEddy.LemonadeStand
             Print("TO YOU (THE OTHER STANDS' SALES WILL NOT");
             Print("AFFECT YOUR BUSINESS IN ANY WAY). IF YOU");
             Print("MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
+        }
+
+        private int GetPlayerCount()
+        {
+            int playerCount = -1;
 
             do
             {
                 Print("HOW MANY PEOPLE WILL BE PLAYING?");
                 string NS = _io.GetInput();
-                NumberOfPlayers = int.Parse(NS);
+                playerCount = int.Parse(NS);
             }
-            while (NumberOfPlayers < 1 || NumberOfPlayers > 30);
+            while (playerCount < 1 || playerCount > 30);
+
+            return playerCount;
         }
 
         private void Sub13000_NewBusiness()
