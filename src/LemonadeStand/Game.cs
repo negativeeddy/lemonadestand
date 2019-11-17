@@ -144,8 +144,7 @@ namespace NegativeEddy.LemonadeStand
                 Print();
                 if (stand.IsBankrupt)
                 {
-                    Print("YOU ARE BANKRUPT, NO DECISIONS");
-                    Print("FOR YOU TO MAKE.");
+                    Print("YOU ARE BANKRUPT, NO DECISIONS FOR YOU TO MAKE.");
                     if (Stands.Count() == 1 && Stands.First().Assets < CostPerGlassDollars)
                     {
                         Exit();
@@ -155,13 +154,11 @@ namespace NegativeEddy.LemonadeStand
                 {
                     while (true)
                     {
-                        Print("HOW MANY GLASSES OF LEMONADE DO YOU");
-                        Print("WISH TO MAKE ");
+                        Print("HOW MANY GLASSES OF LEMONADE DO YOU WISH TO MAKE ");
                         stand.GlassesMade = int.Parse(_io.GetInput());
                         if (stand.GlassesMade < 0 || stand.GlassesMade > 1000)
                         {
-                            Print("COME ON, LET'S BE REASONABLE NOW!!!");
-                            Print("TRY AGAIN");
+                            Print("COME ON, LET'S BE REASONABLE NOW!!!\nTRY AGAIN");
                             continue;
                         }
 
@@ -170,16 +167,13 @@ namespace NegativeEddy.LemonadeStand
                             // user can purchase that amount of lemonade
                             break;
                         }
-                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {stand.Assets:C2} ");
-                        Print($"IN CASH AND TO MAKE {stand.GlassesMade} GLASSES OF ");
-                        Print($"LEMONADE YOU NEED ${stand.GlassesMade * CostPerGlassDollars:C2} IN CASH.");
+                        Print($"THINK AGAIN!!!  YOU HAVE ONLY {stand.Assets:C2} IN CASH AND TO MAKE {stand.GlassesMade} GLASSES OF LEMONADE YOU NEED ${stand.GlassesMade * CostPerGlassDollars:C2} IN CASH.");
                     }
 
                     while (true)
                     {
                         Print();
-                        Print($"HOW MANY ADVERTISING SIGNS ({CostPerSignDollars * 100} CENTS");
-                        Print($"EACH) DO YOU WANT TO MAKE ");
+                        Print($"HOW MANY ADVERTISING SIGNS ({CostPerSignDollars * 100} CENTS EACH) DO YOU WANT TO MAKE ");
                         stand.SignsMade = int.Parse(_io.GetInput());
                         if (stand.SignsMade < 0 || stand.SignsMade > 50)
                         {
@@ -194,15 +188,13 @@ namespace NegativeEddy.LemonadeStand
 
                         Print();
                         decimal tmp = stand.Assets - stand.GlassesMade * CostPerGlassDollars;
-                        Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2}");
-                        Print("IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
+                        Print($"THINK AGAIN, YOU HAVE ONLY {tmp:C2} IN CASH LEFT AFTER MAKING YOUR LEMONADE.");
                     }
 
                     while (true)
                     {
                         Print();
-                        Print("WHAT PRICE (IN CENTS) DO YOU WISH TO");
-                        Print("CHARGE FOR LEMONADE ");
+                        Print("WHAT PRICE (IN CENTS) DO YOU WISH TO CHARGE FOR LEMONADE ");
                         stand.PricePerGlassCents = int.Parse(_io.GetInput());
                         if (stand.PricePerGlassCents <= 0 || stand.PricePerGlassCents >= 100)
                         {
@@ -223,7 +215,7 @@ namespace NegativeEddy.LemonadeStand
                 {
                     stand.RuinedByThunderstorm = true;
                 }
-                PrintThunderstorm();
+                Print("WEATHER REPORT:  A SEVERE THUNDERSTORM HIT LEMONSVILLE EARLIER TODAY, JUST AS THE LEMONADE STANDS WERE BEING SET UP. UNFORTUNATELY, EVERYTHING WAS RUINED!!");
             }
             else
             {
@@ -232,7 +224,8 @@ namespace NegativeEddy.LemonadeStand
 
                 if (StreetCrewBuysEverything)
                 {
-                    Print_StreetCrewsBoughtEverything();
+                    Print("THE STREET CREWS BOUGHT ALL YOUR LEMONADE AT LUNCHTIME!!");
+                    Print();
                 }
             }
 
@@ -278,11 +271,9 @@ namespace NegativeEddy.LemonadeStand
                 decimal profit = income - expenses;
                 stand.Assets += profit;
 
-                Print();
                 if (stand.IsBankrupt)
                 {
-                    Print($"STAND {stand.Id}");
-                    Print("  BANKRUPT");
+                    Print($"STAND {stand.Id} BANKRUPT");
                 }
                 else
                 {
@@ -298,9 +289,7 @@ namespace NegativeEddy.LemonadeStand
 
                     if (stand.Assets <= CostPerGlassDollars)
                     {
-                        Print($"STAND {stand.Id}");
-                        Print("  ...YOU DON'T HAVE ENOUGH MONEY LEFT");
-                        Print(" TO STAY IN BUSINESS  YOU'RE BANKRUPT!");
+                        Print($"STAND {stand.Id}\n  ...YOU DON'T HAVE ENOUGH MONEY LEFT TO STAY IN BUSINESS YOU'RE BANKRUPT!");
                         stand.IsBankrupt = true;
                         if (Stands.Length == 1 && Stands[0].IsBankrupt)
                         {
@@ -318,7 +307,6 @@ namespace NegativeEddy.LemonadeStand
 
         private void UpdateCostPerGlass()
         {
-            Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
             if (Day < 3)
             {
                 CostPerGlassDollars = 0.02M;
@@ -331,8 +319,8 @@ namespace NegativeEddy.LemonadeStand
             {
                 CostPerGlassDollars = 0.05M;
             }
-            Print($"{CostPerGlassDollars:C2}");
-            Print();
+
+            Print($"ON DAY {Day}, THE COST OF LEMONADE IS {CostPerGlassDollars:C2}");
 
             if (Day == 3)
             {
@@ -342,6 +330,7 @@ namespace NegativeEddy.LemonadeStand
             {
                 Print("(THE PRICE OF LEMONADE MIX JUST WENT UP)");
             }
+            Print();
         }
 
         private void RandomEvents()
@@ -349,21 +338,19 @@ namespace NegativeEddy.LemonadeStand
             switch (SkyColor)
             {
                 case 7:
-                    PrintHeatWave();
+                    Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
                     WeatherFactor = 2;
                     break;
                 case 10:
                     if (_random.Next(100) > 25)
                     {
                         int chanceOfRain = 30 + _random.Next(5) * 10;
-                        Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN,");
-                        Print("AND THE WEATHER IS COOLER TODAY.");
+                        Print($"THERE IS A {chanceOfRain}% CHANCE OF LIGHT RAIN, AND THE WEATHER IS COOLER TODAY.");
                         WeatherFactor = 1 - chanceOfRain / 100.0d;
                     }
                     else
                     {
-                        Print("THE STREET DEPARTMENT IS WORKING TODAY.");
-                        Print("THERE WILL BE NO TRAFFIC ON YOUR STREET.");
+                        Print("THE STREET DEPARTMENT IS WORKING TODAY. THERE WILL BE NO TRAFFIC ON YOUR STREET.");
 
                         if (_random.Next(100) < 50)
                         {
@@ -379,25 +366,6 @@ namespace NegativeEddy.LemonadeStand
             }
         }
 
-        private void Print_StreetCrewsBoughtEverything()
-        {
-            Print("THE STREET CREWS BOUGHT ALL YOUR");
-            Print("LEMONADE AT LUNCHTIME!!");
-        }
-
-        private void PrintThunderstorm()
-        {
-            Print("WEATHER REPORT:  A SEVERE THUNDERSTORM");
-            Print("HIT LEMONSVILLE EARLIER TODAY, JUST AS");
-            Print("THE LEMONADE STANDS WERE BEING SET UP.");
-            Print("UNFORTUNATELY, EVERYTHING WAS RUINED!!");
-        }
-
-        private void PrintHeatWave()
-        {
-            Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
-        }
-
         private struct DailyResult
         {
             public int Day;
@@ -410,45 +378,22 @@ namespace NegativeEddy.LemonadeStand
 
         private void PrintDailyReport(DailyResult result)
         {
-            Print($"   DAY {result.Day} STAND {result.Stand.Id}");
-            Print();
-            Print();
-
+            Print($"  DAY {result.Day} STAND {result.Stand.Id}");
             Print($"  {result.GlassesSold} GLASSES SOLD");
-            Print();
 
             var tmp = result.Stand.PricePerGlassCents / 100.0M;
-            Print($"{tmp:C2} PER GLASS");
-
-            Print($"INCOME {result.Income:C2}");
-
-            Print();
-            Print();
+            Print($"  {tmp:C2} PER GLASS");
+            Print($"  INCOME {result.Income:C2}");
             Print($"  {result.Stand.GlassesMade} GLASSES MADE");
-            Print();
-
             Print($"  {result.Stand.SignsMade} SIGNS MADE\t EXPENSES {result.Expenses:C2}");
-            Print();
-            Print();
-
             Print($"  PROFIT {result.Profit:C}");
-            Print();
-
-            Print($"  ASSETS  {result.Stand.Assets:C}");
-
+            Print($"  ASSETS {result.Stand.Assets:C}");
         }
 
         private void TitlePage()
         {
-            Print("HI!  WELCOME TO LEMONSVILLE, CALIFORNIA!");
-            Print();
-            Print("IN THIS SMALL TOWN, YOU ARE IN CHARGE OF");
-            Print("RUNNING YOUR OWN LEMONADE STAND. YOU CAN");
-            Print("COMPETE WITH AS MANY OTHER PEOPLE AS YOU");
-            Print("WISH, BUT HOW MUCH PROFIT YOU MAKE IS UP");
-            Print("TO YOU (THE OTHER STANDS' SALES WILL NOT");
-            Print("AFFECT YOUR BUSINESS IN ANY WAY). IF YOU");
-            Print("MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
+            Print("HI! WELCOME TO LEMONSVILLE, CALIFORNIA!");
+            Print("IN THIS SMALL TOWN, YOU ARE IN CHARGE OF RUNNING YOUR OWN LEMONADE STAND. YOU CAN COMPETE WITH AS MANY OTHER PEOPLE AS YOU WISH, BUT HOW MUCH PROFIT YOU MAKE IS UP TO YOU (THE OTHER STANDS' SALES WILL NOT AFFECT YOUR BUSINESS IN ANY WAY). IF YOU MAKE THE MOST MONEY, YOU'RE THE WINNER!!");
         }
 
         private int GetPlayerCount()
@@ -467,31 +412,22 @@ namespace NegativeEddy.LemonadeStand
 
         private void PrintIntro()
         {
-            Print("TO MANAGE YOUR LEMONADE STAND, YOU WILL ");
-            Print("NEED TO MAKE THESE DECISIONS EVERY DAY: ");
+            Print("TO MANAGE YOUR LEMONADE STAND, YOU WILL NEED TO MAKE THESE DECISIONS EVERY DAY: ");
             Print();
-            Print("1. HOW MANY GLASSES OF LEMONADE TO MAKE    (ONLY ONE BATCH IS MADE EACH MORNING)");
-            Print("2. HOW MANY ADVERTISING SIGNS TO MAKE      (THE SIGNS COST FIFTEEN CENTS EACH)  ");
+            Print("1. HOW MANY GLASSES OF LEMONADE TO MAKE (ONLY ONE BATCH IS MADE EACH MORNING)");
+            Print("2. HOW MANY ADVERTISING SIGNS TO MAKE (THE SIGNS COST FIFTEEN CENTS EACH)  ");
             Print("3. WHAT PRICE TO CHARGE FOR EACH GLASS  ");
             Print();
-            Print($"YOU WILL BEGIN WITH {InitialAssets:C2} CASH (ASSETS).");
-            Print("BECAUSE YOUR MOTHER GAVE YOU SOME SUGAR,");
-            Print("YOUR COST TO MAKE LEMONADE IS TWO CENTS ");
-            Print("A GLASS (THIS MAY CHANGE IN THE FUTURE).");
+            Print($"YOU WILL BEGIN WITH {InitialAssets:C2} CASH (ASSETS). BECAUSE YOUR MOTHER GAVE YOU SOME SUGAR, YOUR COST TO MAKE LEMONADE IS TWO CENTS A GLASS (THIS MAY CHANGE IN THE FUTURE).");
             Print();
 
-            Print("YOUR EXPENSES ARE THE SUM OF THE COST OF");
-            Print("THE LEMONADE AND THE COST OF THE SIGNS. ");
+            Print("YOUR EXPENSES ARE THE SUM OF THE COST OF THE LEMONADE AND THE COST OF THE SIGNS.");
             Print();
-            Print("YOUR PROFITS ARE THE DIFFERENCE BETWEEN ");
-            Print("THE INCOME FROM SALES AND YOUR EXPENSES.");
+            Print("YOUR PROFITS ARE THE DIFFERENCE BETWEEN THE INCOME FROM SALES AND YOUR EXPENSES.");
             Print();
-            Print("THE NUMBER OF GLASSES YOU SELL EACH DAY ");
-            Print("DEPENDS ON THE PRICE YOU CHARGE, AND ON ");
-            Print("THE NUMBER OF ADVERTISING SIGNS YOU USE.");
+            Print("THE NUMBER OF GLASSES YOU SELL EACH DAY DEPENDS ON THE PRICE YOU CHARGE, AND ON THE NUMBER OF ADVERTISING SIGNS YOU USE.");
             Print();
-            Print("KEEP TRACK OF YOUR ASSETS, BECAUSE YOU  ");
-            Print("CAN'T SPEND MORE MONEY THAN YOU HAVE!   ");
+            Print("KEEP TRACK OF YOUR ASSETS, BECAUSE YOU CAN'T SPEND MORE MONEY THAN YOU HAVE!   ");
             Print();
         }
 
