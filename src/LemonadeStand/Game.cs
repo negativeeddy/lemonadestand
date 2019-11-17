@@ -29,7 +29,7 @@ namespace NegativeEddy.LemonadeStand
         /// </summary>
         public int Day { get; set; }
 
-        public Stand[] Stands { get; set; }
+        public Stand[]? Stands { get; set; }
 
         private int CostPerGlassCents; // C: cost of lemonade per glass, in cents 
         private int MaxPricePerGlassCents;
@@ -81,6 +81,11 @@ namespace NegativeEddy.LemonadeStand
 
         public bool Step()
         {
+            if (Stands == null)
+            {
+                throw new InvalidOperationException("Game not initialized");
+            }
+
             SkyColor = _random.Next(10);
             if (SkyColor < 6)
             {
@@ -100,13 +105,6 @@ namespace NegativeEddy.LemonadeStand
                 SkyColor = 2;
             }
 
-            Sub500_StartOfNewDay();
-
-            return true;
-        }
-
-        private void Sub500_StartOfNewDay()
-        {
             Day++;
             Print($"ON DAY {Day}, THE COST OF LEMONADE IS ");
             if (Day < 3)
@@ -319,8 +317,11 @@ namespace NegativeEddy.LemonadeStand
                     }
                 }
             }
+
             WeatherFactor = 1;
             StreetCrewBuysAll = false;
+
+            return true;
         }
 
         private void Sub2000_RandomEvents()
