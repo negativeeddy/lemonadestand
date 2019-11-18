@@ -60,8 +60,6 @@ namespace NegativeEddy.LemonadeStand
         /// </summary>
         public decimal CostPerGlassDollars { get; private set; }
 
-        private SkyOutlook Sky;
-
         public void Init(decimal intialAssets = 2.0M)
         {
             TitlePage();
@@ -96,29 +94,23 @@ namespace NegativeEddy.LemonadeStand
 
             int skyChance = _random.Next(10);
 
-            if (skyChance < 6)
+            SkyOutlook sky;
+            if (Day < 3)
             {
-                Sky = SkyOutlook.Sunny;
-            }
-            else if (skyChance < 8)
-            {
-                Sky = SkyOutlook.Cloudy;
+                // first days are always Hot and Dry to help newer 
+                // players
+                sky = SkyOutlook.HotAndDry;
             }
             else
             {
-                Sky = SkyOutlook.HotAndDry;
-            }
-
-            if (Day < 3)
-            {
-                Sky = SkyOutlook.HotAndDry;
+                sky = GetRandomSky(skyChance);
             }
 
             UpdateCostPerGlass();
 
             if (Day > 2)
             {
-                (weatherFactor, streetCrewBuysEverything) = RandomEvents();
+                (weatherFactor, streetCrewBuysEverything) = RandomEvents(sky);
             }
 
 
@@ -146,10 +138,10 @@ namespace NegativeEddy.LemonadeStand
 
             Print();
 
-            if (Sky == SkyOutlook.Cloudy && _random.Next(100) < 25)
+            if (sky == SkyOutlook.Cloudy && _random.Next(100) < 25)
             {
                 // thunderstorm happened
-                Sky = SkyOutlook.Thunderstorms;
+                sky = SkyOutlook.Thunderstorms;
                 ruinedByThunderstorm = true;
                 Print("WEATHER REPORT:  A SEVERE THUNDERSTORM HIT LEMONSVILLE EARLIER TODAY, JUST AS THE LEMONADE STANDS WERE BEING SET UP. UNFORTUNATELY, EVERYTHING WAS RUINED!!");
             }
@@ -209,6 +201,25 @@ namespace NegativeEddy.LemonadeStand
 
 
             return true;
+        }
+
+        private static SkyOutlook GetRandomSky(int skyChance)
+        {
+            SkyOutlook sky;
+            if (skyChance < 6)
+            {
+                sky = SkyOutlook.Sunny;
+            }
+            else if (skyChance < 8)
+            {
+                sky = SkyOutlook.Cloudy;
+            }
+            else
+            {
+                sky = SkyOutlook.HotAndDry;
+            }
+
+            return sky;
         }
 
         private int CalculateGlassesSold(Stand stand, double weatherFactor, bool streetCrewBuysEverything, bool ruinedByThunderstorm)
@@ -340,12 +351,12 @@ namespace NegativeEddy.LemonadeStand
             Print();
         }
 
-        private (double weatherFactor, bool streetCrewBuysEverything) RandomEvents()
+        private (double weatherFactor, bool streetCrewBuysEverything) RandomEvents(SkyOutlook sky)
         {
             double weatherFactor = 1;
             bool streetCrewBuysEverything = false;
 
-            switch (Sky)
+            switch (sky)
             {
                 case SkyOutlook.HotAndDry:
                     Print("A HEAT WAVE IS PREDICTED FOR TODAY!");
